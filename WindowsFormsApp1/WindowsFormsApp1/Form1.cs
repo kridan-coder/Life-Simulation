@@ -71,18 +71,25 @@ namespace WindowsFormsApp1
         {
             graphics.Clear(Color.AliceBlue);
 
-            var new_is_alive = new bool[rows,cols];
             int next_x;
             int next_y;
             int direction;
             bool clear = false;
+
             for (int x = 0; x < rows; x++)
                 for (int y = 0; y < cols; y++)
                 {
                     if (is_alive[x, y])
                     {
                         graphics.FillRectangle(Brushes.Black, x * resolution, y * resolution, resolution, resolution);
+                    }
+                }
 
+            for (int x = 0; x < rows; x++)
+                for (int y = 0; y < cols; y++)
+                {
+                    if (is_alive[x, y])
+                    {
                         next_x = x;
                         next_y = y;
                         clear = false;
@@ -104,24 +111,23 @@ namespace WindowsFormsApp1
                                 break;
                         }
                         if (CheckBorders(next_x, next_y, rows, cols))
-                            if (!new_is_alive[next_x, next_y])
+                            if (!is_alive[next_x, next_y])
                             {
                                 clear = true;
                             }
                             
                         if (clear)
                         {
-                            new_is_alive[next_x, next_y] = true;
-                        }
-                        else
-                        {
-                            new_is_alive[x, y] = true;
+                            is_alive[next_x, next_y] = true;
+                            is_alive[x, y] = false;
                         }
                     }
                 }
+
+
             
-            is_alive = new_is_alive;
-            pictureBox1.Refresh();
+
+           pictureBox1.Refresh();
         }
         
 
@@ -133,8 +139,6 @@ namespace WindowsFormsApp1
         private void timer1_Tick(object sender, EventArgs e)
         {
             NextGenerationMove(rows, cols);
-
-
         }
         
         
