@@ -13,13 +13,13 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
-
+        Random random = new Random();
         private Graphics graphics;
-        private int resolution = 1;
+        private int resolution = 30;
         private int density = 10;
         private bool [,] is_alive;
-        private int rows = 1000;
-        private int cols = 1000;
+        private int rows;
+        private int cols;
         
         // to start the game u should click on the screen
         private void StartGame()
@@ -35,7 +35,7 @@ namespace WindowsFormsApp1
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             graphics = Graphics.FromImage(pictureBox1.Image);
 
-            Random random = new Random();
+            
             for(int x = 0; x < cols; x++)
             {
                 for(int y=0; y < rows; y++)
@@ -43,13 +43,10 @@ namespace WindowsFormsApp1
                      if(random.Next(density) == 0)
                     {
                         is_alive[x, y] = true;
-                        graphics.FillRectangle(Brushes.Black, x, y, resolution, resolution);
+                        graphics.FillRectangle(Brushes.Black, x*resolution, y * resolution, resolution, resolution);
                     }
                 }
             }
-
-            
-
 
             
             timer1.Start();
@@ -62,19 +59,7 @@ namespace WindowsFormsApp1
             timer1.Stop();
         }
 
-        private bool CheckNeighbours(int x, int y, int rows, int cols)
-        {
-            if (x - 1 >= 0 && !is_alive[x - 1, y])
-                return true;
-            if (x + 1 < rows && !is_alive[x + 1, y])
-                return true;
-            if (y + 1 < cols && !is_alive[x, y + 1])
-                return true;
-            if (y - 1 >= 0 && !is_alive[x, y - 1])
-                return true;
-
-            return false;
-        }
+       
         private bool CheckBorders(int x, int y, int rows, int cols)
         {
             if (x >= 0 && y >= 0 && x < rows && y < cols)
@@ -82,56 +67,63 @@ namespace WindowsFormsApp1
             return false;
         }
 
-
         private void NextGenerationMove(int rows, int cols)
         {
+            graphics.Clear(Color.AliceBlue);
+
+            var new_is_alive = new bool[rows,cols];
+            int next_x;
+            int next_y;
+            int direction;
+            bool clear = false;
             for (int x = 0; x < rows; x++)
                 for (int y = 0; y < cols; y++)
                 {
                     if (is_alive[x, y])
-                        NextGenerationUnit(x, y, rows, cols);
+                    {
+                        graphics.FillRectangle(Brushes.Black, x * resolution, y * resolution, resolution, resolution);
+
+                        next_x = x;
+                        next_y = y;
+                        clear = false;
+
+                        direction = random.Next(4);
+                        switch (direction)
+                        {
+                            case 0:
+                                next_y -= 1;
+                                break;
+                            case 1:
+                                next_x += 1;
+                                break;
+                            case 2:
+                                next_y += 1;
+                                break;
+                            case 3:
+                                next_x -= 1;
+                                break;
+                        }
+                        if (CheckBorders(next_x, next_y, rows, cols))
+                            if (!new_is_alive[next_x, next_y])
+                            {
+                                clear = true;
+                            }
+                            
+                        if (clear)
+                        {
+                            new_is_alive[next_x, next_y] = true;
+                        }
+                        else
+                        {
+                            new_is_alive[x, y] = true;
+                        }
+                    }
                 }
+            
+            is_alive = new_is_alive;
+            pictureBox1.Refresh();
         }
-        private void NextGenerationUnit(int x, int y, int rows, int cols)
-        {
-
-
-            if (CheckNeighbours(x, y, rows, cols))
-            {
-                Random random = new Random();
-                int next_x = x;
-                int next_y = y;
-                int direction;
-                bool clear = false;
-
-                direction = random.Next(4);
-                switch (direction)
-                {
-                    case 0:
-                        next_y -= 1;
-                        break;
-                    case 1:
-                        next_x += 1;
-                        break;
-                    case 2:
-                        next_y += 1;
-                        break;
-                    case 3:
-                        next_x -= 1;
-                        break;
-                }
-                if (CheckBorders(next_x, next_y, rows, cols))
-                    clear = true;
-                if (clear)
-                { 
-                    is_alive[x, y] = false;
-                    graphics.FillRectangle(Brushes.AliceBlue, x, y, resolution, resolution);
-                    is_alive[next_x, next_y] = true;
-                    graphics.FillRectangle(Brushes.Black, next_x, next_y, resolution, resolution);
-                    pictureBox1.Refresh();
-                }
-            }
-        }
+        
 
         public Form1()
         {
