@@ -15,8 +15,8 @@ namespace WindowsFormsApp1
     {
         Random random = new Random();
         private Graphics graphics;
-        private int resolution = 30;
-        private int density = 10;
+        private int resolution = 5;
+        private int density = 50;
         private bool [,] is_alive;
         private int rows;
         private int cols;
@@ -34,7 +34,6 @@ namespace WindowsFormsApp1
 
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             graphics = Graphics.FromImage(pictureBox1.Image);
-
             
             for(int x = 0; x < cols; x++)
             {
@@ -84,6 +83,7 @@ namespace WindowsFormsApp1
                         graphics.FillRectangle(Brushes.Black, x * resolution, y * resolution, resolution, resolution);
                     }
                 }
+            
 
             for (int x = 0; x < rows; x++)
                 for (int y = 0; y < cols; y++)
