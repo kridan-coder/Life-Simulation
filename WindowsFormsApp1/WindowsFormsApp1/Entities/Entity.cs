@@ -12,10 +12,8 @@ namespace WindowsFormsApp1
         {
             x = _x;
             y = _y;
-            is_alive = true;
         }
 
-        public bool is_alive;
         public int x;
         public int y;
 

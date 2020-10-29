@@ -10,327 +10,170 @@ namespace WindowsFormsApp1
     public class Map
     {
         Random random = new Random();
-        private Cell[,] map;
+        public Cell[,] map;
         public List<Organism> organisms = new List<Organism>();
         public List<Plant> plants = new List<Plant>();
         public int rows;
         public int cols;
-        private int organismsAmount;
-        private int plantsAmount;
-        private int plantsGrowth;
-        private int organismsRange;
+        public int organismsAmount;
+        public int plantsAmount;
+        public int plantsGrowth;
+        public int lastOrgID = 0;
+        public int untilDayOrNight;
+        public int dayOrNightLastsFor = 0;
+        public bool day = true;
+        public int minOrgRange;
+        public int orgRollBackReproduce;
+        public int orgDeadBeforeBecomingGrass;
 
-
-        Form1 form1;
-
-        public Map(int resolution, int _organisms, int _plants, int _plantsGrowth, int _organismsRange, ref Form1 form)
+        public Map(int _organisms, int _plants, int _plantsGrowth, int _rows, int _cols, int _dayNightChange, int _minOrgRange, int _orgRollBackReproduce, int _orgDeadBeforeBecomingGrass)
         {
-            form1 = form;
             organismsAmount = _organisms;
             plantsAmount = _plants;
             plantsGrowth = _plantsGrowth;
-            organismsRange = _organismsRange;
-            rows = form1.CountRows(resolution);
-            cols = form1.CountCols(resolution);
+            rows = _rows;
+            cols = _cols;
+            untilDayOrNight = _dayNightChange;
+            minOrgRange = _minOrgRange;
+            orgRollBackReproduce = _orgRollBackReproduce;
+            orgDeadBeforeBecomingGrass = _orgDeadBeforeBecomingGrass;
             map = new Cell[cols, rows];
             for (int i = 0; i < cols; i++)
-            {
                 for (int j = 0; j < rows; j++)
-                {
                     map[i, j] = new Cell();
+        }
+        private bool timeToChangeDayOrNight()
+        {
+            if (dayOrNightLastsFor >= untilDayOrNight)
+            {
+                dayOrNightLastsFor = 0;
+                return true;
+            }
+            else
+            {
+                dayOrNightLastsFor++;
+                return false;
+            }
+        }
+        private void addPlants()
+        {
+            int rand_ind;
+            (int, int) x_y;
+
+            for (int i = 0; i < plantsGrowth;)
+            {
+                rand_ind = random.Next(plants.Count);
+                x_y = plants[rand_ind].Grow(this);
+                if (x_y.Item1 != -1)
+                {
+                    plants.Add(new Plant(x_y.Item1, x_y.Item2));
+                    map[x_y.Item1, x_y.Item2].on_cell.Add(plants[plants.Count - 1]);
+                    i++;
                 }
             }
         }
-
-        private bool checkBorders(int x, int y, int cols, int rows)
+        public Organism GetOrganismOnCell(int x, int y)
+        {
+            for (int i = 0; i < map[x, y].on_cell.Count; i++)
+            {
+                if (map[x, y].on_cell[i] is Organism)
+                {
+                    return (Organism)map[x, y].on_cell[i];
+                }
+            }
+            return null;
+        }
+        public bool CheckBorders(int x, int y, int cols, int rows)
         {
             if (x >= 0 && y >= 0 && x < cols && y < rows)
                 return true;
             return false;
         }
-
-        // return [0-8]{1}. 0 means that no food was found. [1-8] means directions.
-        // 1 2 3
-        // 8   4
-        // 7 6 5
-        private int checkFood(Organism organism)
+        public void DeleteOrgOnCell(Organism me)
         {
-
-            int range = 1;
-            organism.foundFood = false;
-            while (!organism.foundFood && range <= organismsRange)
+            for (int i = 0; i < map[me.x, me.y].on_cell.Count; i++)
             {
-
-                for (int i = organism.x - range; i < organism.x + range; i++)
+                if (map[me.x, me.y].on_cell[i] is Organism)
                 {
-                    if (checkBorders(i, organism.y - range, cols, rows))
-                    {
-                        if (map[i, organism.y - range].on_cell is Plant)
-                        {
-                            organism.foundFood = true;
+                    Organism isItMe = (Organism)map[me.x, me.y].on_cell[i];
+                    if (isItMe.orgID == me.orgID)
+                        map[me.x, me.y].on_cell.Remove(map[me.x, me.y].on_cell[i]);
 
-                            if (organism.x > i)
-                            {
-
-                                return 1;
-
-                            }
-                            else if (organism.x == i)
-                            {
-
-                                return 2;
-                            }
-                            else if (organism.x < i)
-                            {
-
-                                return 3;
-                            }
-                        }
-                    }
-
-                }
-                for (int i = organism.y - range; i < organism.y + range; i++)
-                {
-                    if (checkBorders(organism.x + range, i, cols, rows))
-                    {
-                        if (map[organism.x + range, i].on_cell is Plant)
-                        {
-                            organism.foundFood = true;
-
-                            if (organism.y > i)
-                            {
-
-                                return 3;
-                            }
-                            else if (organism.y == i)
-                            {
-
-                                return 4;
-                            }
-                            else if (organism.y < i)
-                            {
-
-                                return 5;
-                            }
-                        }
-                    }
-                }
-                for (int i = organism.x + range; i > organism.x - range; i--)
-                {
-                    if (checkBorders(i, organism.y + range, cols, rows))
-                    {
-                        if (map[i, organism.y + range].on_cell is Plant)
-                        {
-                            organism.foundFood = true;
-
-                            if (organism.x < i)
-                            {
-
-                                return 5;
-                            }
-                            else if (organism.x == i)
-                            {
-
-                                return 6;
-                            }
-                            else if (organism.x > i)
-                            {
-
-                                return 7;
-                            }
-                        }
-                    }
-                }
-                for (int i = organism.y + range; i > organism.y - range; i--)
-                {
-                    if (checkBorders(organism.x - range, i, cols, rows))
-                    {
-                        if (map[organism.x - range, i].on_cell is Plant)
-                        {
-                            organism.foundFood = true;
-
-                            if (organism.y < i)
-                            {
-
-                                return 7;
-                            }
-                            else if (organism.y == i)
-                            {
-
-                                return 8;
-                            }
-                            else if (organism.y > i)
-                            {
-
-
-                                return 1;
-                            }
-                        }
-                    }
-                }
-                range++;
-            }
-
-            return 0;
-        }
-
-        private void moveOnMap(Organism organism, int direction)
-        {
-
-            switch (direction)
-            {
-                case 1:
-                    if (checkBorders(organism.x - 1, organism.y, cols, rows) && !(map[organism.x - 1, organism.y].on_cell is Organism))
-                    {
-
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.x--;
-
-                    }
-                    else if (checkBorders(organism.x, organism.y - 1, cols, rows) && !(map[organism.x, organism.y - 1].on_cell is Organism))
-                    {
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.y--;
-
-                    }
-                    break;
-                case 2:
-                    if (checkBorders(organism.x, organism.y - 1, cols, rows) && !(map[organism.x, organism.y - 1].on_cell is Organism))
-                    {
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.y--;
-                    }
-                    break;
-                case 3:
-                    if (checkBorders(organism.x + 1, organism.y, cols, rows) && !(map[organism.x + 1, organism.y].on_cell is Organism))
-                    {
-
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.x++;
-
-                    }
-                    else if (checkBorders(organism.x, organism.y - 1, cols, rows) && !(map[organism.x, organism.y - 1].on_cell is Organism))
-                    {
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.y--;
-
-                    }
-                    break;
-                case 4:
-                    if (checkBorders(organism.x + 1, organism.y, cols, rows) && !(map[organism.x + 1, organism.y].on_cell is Organism))
-                    {
-
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.x++;
-
-                    }
-                    break;
-                case 5:
-                    if (checkBorders(organism.x + 1, organism.y, cols, rows) && !(map[organism.x + 1, organism.y].on_cell is Organism))
-                    {
-
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.x++;
-
-                    }
-                    else if (checkBorders(organism.x, organism.y + 1, cols, rows) && !(map[organism.x, organism.y + 1].on_cell is Organism))
-                    {
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.y++;
-
-                    }
-                    break;
-                case 6:
-                    if (checkBorders(organism.x, organism.y + 1, cols, rows) && !(map[organism.x, organism.y + 1].on_cell is Organism))
-                    {
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.y++;
-
-                    }
-                    break;
-                case 7:
-                    if (checkBorders(organism.x - 1, organism.y, cols, rows) && !(map[organism.x - 1, organism.y].on_cell is Organism))
-                    {
-
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.x--;
-
-                    }
-                    else if (checkBorders(organism.x, organism.y + 1, cols, rows) && !(map[organism.x, organism.y + 1].on_cell is Organism))
-                    {
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.y++;
-
-                    }
-                    break;
-                case 8:
-                    if (checkBorders(organism.x - 1, organism.y, cols, rows) && !(map[organism.x - 1, organism.y].on_cell is Organism))
-                    {
-
-                        map[organism.x, organism.y].on_cell = null;
-
-                        organism.x--;
-
-                    }
-                    break;
-            }
-        }
-
-        private void addPlants()
-        {
-            int x, y;
-
-            for (int i = 0; i < plantsGrowth;)
-            {
-                x = random.Next(cols);
-                y = random.Next(rows);
-                if (map[x, y].on_cell is null)
-                {
-                    plants.Add(new Plant(x, y));
-                    map[x, y].on_cell = plants[plants.Count - 1];
-                    i++;
                 }
             }
         }
+        public void DeletePlantOnCell(int x, int y)
+        {
+            for (int i = 0; i < map[x, y].on_cell.Count; i++)
+            {
+                if (map[x, y].on_cell[i] is Plant)
+                {
+                    map[x, y].on_cell.Remove(map[x, y].on_cell[i]);
+                }
+            }
+        }
+        public bool OrganismIsOnCell(int x, int y)
+        {
+            for (int i = 0; i < map[x,y].on_cell.Count; i++)
+            {
+                if (map[x, y].on_cell[i] is Organism)
+                    return true;
+            }
+            return false;
+        }
+        public bool OrganismHasOppositeSex(int x, int y, bool sex, Organism me)
+        {
+            for (int i = 0; i < map[x, y].on_cell.Count; i++)
+                if (map[x, y].on_cell[i] is Organism)
+                {
+                    Organism potentialPartner = (Organism)map[x, y].on_cell[i];
+                    if (potentialPartner.male != sex && potentialPartner.is_alive && potentialPartner.wantReproduce)
+                        return true; 
+                }
 
+            return false;
+        }
+        public bool PlantIsOnCell(int x, int y)
+        {
+            for (int i = 0; i < map[x, y].on_cell.Count; i++)
+                if (map[x, y].on_cell[i] is Plant)
+                    return true;
+            return false;
+        }
         public Cell[,] CreateWorld()
         {
             int x, y;
+            bool male;
+            int orgRange;
 
             // set plants
             for (int i = 0; i < plantsAmount;)
             {
                 x = random.Next(cols);
                 y = random.Next(rows);
-                if (map[x, y].on_cell is null)
+                if (map[x, y].on_cell.Count == 0)
                 {
                     plants.Add(new Plant(x, y));
-                    map[x, y].on_cell = plants[plants.Count - 1];
+                    map[x, y].on_cell.Add(plants[plants.Count - 1]);
                     i++;
                 }
             }
-
 
             // set organisms
             for (int i = 0; i < organismsAmount;)
             {
                 x = random.Next(cols);
                 y = random.Next(rows);
-                if (map[x, y].on_cell == null)
+                if (random.Next(100) > 50)
+                    male = true;
+                else
+                    male = false;
+                orgRange = minOrgRange + random.Next(minOrgRange);
+
+                if (map[x, y].on_cell.Count == 0)
                 {
-                    organisms.Add(new Organism(x, y));
-                    map[x, y].on_cell = organisms[organisms.Count - 1];
+                    organisms.Add(new Organism(x, y, male, lastOrgID++, orgRange, orgRollBackReproduce, orgDeadBeforeBecomingGrass));
+                    map[x, y].on_cell.Add(organisms[organisms.Count - 1]);
                     i++;
                 }
             }
@@ -338,9 +181,6 @@ namespace WindowsFormsApp1
             return map;
 
         }
-
-
-
         public Cell[,] UpdateWorld()
         {
             addPlants();
@@ -353,49 +193,88 @@ namespace WindowsFormsApp1
                 // surviving ones
                 if (organisms[i].is_alive)
                 {
-
                     direction = 0;
 
                     // eating plants
-                    if (map[organisms[i].x, organisms[i].y].on_cell is Plant)
+                    if (PlantIsOnCell(organisms[i].x, organisms[i].y) && organisms[i].wantFood)
                     {
                         organisms[i].EatPlant();
                         plants.Remove(plants.Find(plant => plant.x == organisms[i].x && plant.y == organisms[i].y));
+                        DeletePlantOnCell(organisms[i].x, organisms[i].y);
                     }
 
-                    map[organisms[i].x, organisms[i].y].on_cell = organisms[i];
+                    // reproducing
+                    if (OrganismHasOppositeSex(organisms[i].x, organisms[i].y, organisms[i].male, organisms[i]) && organisms[i].wantReproduce)
+                    {
+                        organisms[i].Reproduce();
+
+                        for (int j = 0; j < map[organisms[i].x, organisms[i].y].on_cell.Count; j++)
+                        {
+                            if (map[organisms[i].x, organisms[i].y].on_cell[j] is Organism)
+                            {
+                                Organism Partner = (Organism)map[organisms[i].x, organisms[i].y].on_cell[j];
+                                if (Partner.male != organisms[i].male && Partner.is_alive && Partner.wantReproduce)
+                                {
+                                    Partner.Reproduce();
+                                    break;
+                                }
+                            }
+                        }
+
+                        // creating baby
+                        bool male;
+                        if (random.Next(100) > 50)
+                            male = true;
+                        else
+                            male = false;
+                        int orgRange;
+                        orgRange = minOrgRange + random.Next(minOrgRange);
+                        organisms.Add(new Organism(organisms[i].x, organisms[i].y, male, lastOrgID++, orgRange, orgRollBackReproduce, orgDeadBeforeBecomingGrass));
+                        map[organisms[i].x, organisms[i].y].on_cell.Add(organisms[organisms.Count - 1]);
+                    }
+
+                    // wanna reproduce ones
+                    if (organisms[i].wantReproduce)
+                        direction = organisms[i].CheckPartner(this);
 
                     // hungry ones
-                    if (organisms[i].wantFood)
-                    {
-                        direction = checkFood(organisms[i]);
-                    }
-
+                    else if (organisms[i].wantFood)
+                        direction = organisms[i].CheckFood(this);
 
                     if (direction == 0)
                         direction = random.Next(9);
 
                     // organism movement
-                    moveOnMap(organisms[i], direction);
+                    organisms[i].MoveOnMap(direction, this);
                     organisms[i].MakeMove();
 
-
+                    // organism made his move on the previous step. Now he is in another cell.
+                    map[organisms[i].x, organisms[i].y].on_cell.Add(organisms[i]);
                 }
-                // gonna die
                 else
                 {
-                    map[organisms[i].x, organisms[i].y].on_cell = null;
-                    organisms.Remove(organisms[i]);
+                    if (organisms[i].DeadLongEnough())
+                    {
+                        // create plant
+                        if (!PlantIsOnCell(organisms[i].x, organisms[i].y))
+                        {
+                            plants.Add(new Plant(organisms[i].x, organisms[i].y));
+                            map[organisms[i].x, organisms[i].y].on_cell.Add(plants[plants.Count - 1]);
+                        }
+
+                        // delete org
+                        DeleteOrgOnCell(organisms[i]);
+                        organisms.Remove(organisms[i]);
+
+                    }
+
                 }
 
             }
 
+            if (timeToChangeDayOrNight())
+                day = !day;
             return map;
-
-
         }
-
-
-
     }
 }

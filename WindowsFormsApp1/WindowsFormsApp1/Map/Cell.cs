@@ -8,6 +8,12 @@ namespace WindowsFormsApp1
 {
     public class Cell
     {
-        public Entity? on_cell;
+        public Cell()
+        {
+#nullable enable
+            on_cell = new List<Entity?>();
+        }
+#nullable enable
+        public List<Entity?> on_cell;
     }
 }
