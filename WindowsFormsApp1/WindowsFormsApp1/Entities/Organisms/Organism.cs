@@ -68,12 +68,9 @@ namespace WindowsFormsApp1
                     else
                         male = false;
                     orgRange = map.minOrgRange + map.random.Next(map.minOrgRange);
-
                     return new Organism(x, y, male, orgRange, map.orgRollBackReproduce, map.orgDeadBeforeBecomingGrass, map);
                 }
             }
-
-
         }
 
         private void checkFood()

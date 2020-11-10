@@ -14,12 +14,6 @@ namespace WindowsFormsApp1
             plantID = lastPlantID++;
         }
 
-        private bool canGrowHere(int x, int y)
-        {
-            return map.CheckBorders(x, y)
-                && !(map.IsOnCell<Organism>(x, y))
-                && !(map.IsOnCell<Plant>(x, y));
-        }
         public Plant? Grow()
         {
             Direction direction = randomDirection4();
@@ -55,8 +49,13 @@ namespace WindowsFormsApp1
                 if (map.map[x, y].on_cell.Count == 0)
                     return new Plant(x, y, map);
             }
-
         }
 
+        private bool canGrowHere(int x, int y)
+        {
+            return map.CheckBorders(x, y)
+                && !(map.IsOnCell<Organism>(x, y))
+                && !(map.IsOnCell<Plant>(x, y));
+        }
     }
 }
