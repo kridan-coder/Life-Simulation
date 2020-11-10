@@ -48,9 +48,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Directions.cs" />
     <Compile Include="Entities\Entity.cs" />
-    <Compile Include="Entities\Organism.cs" />
+    <Compile Include="Entities\Organisms\Herbivore.cs" />
+    <Compile Include="Entities\Organisms\Omnivore.cs" />
+    <Compile Include="Entities\Organisms\Organism.cs" />
     <Compile Include="Entities\Plant.cs" />
+    <Compile Include="Entities\Organisms\Predatory.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

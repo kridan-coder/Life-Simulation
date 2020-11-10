@@ -9,7 +9,7 @@ namespace WindowsFormsApp1
 {
     public class Map
     {
-        Random random = new Random();
+        public Random random = new Random();
         public Cell[,] map;
         public List<Organism> organisms = new List<Organism>();
         public List<Plant> plants = new List<Plant>();
@@ -42,6 +42,8 @@ namespace WindowsFormsApp1
                 for (int j = 0; j < rows; j++)
                     map[i, j] = new Cell();
         }
+
+        // check if day should be changed and increment dayOrNightLastsFor counter if needed
         private bool timeToChangeDayOrNight()
         {
             if (dayOrNightLastsFor >= untilDayOrNight)
@@ -58,32 +60,71 @@ namespace WindowsFormsApp1
         private void addPlants()
         {
             int rand_ind;
-            (int, int) x_y;
-
+            Plant? potentialPlant;
             for (int i = 0; i < plantsGrowth;)
             {
                 rand_ind = random.Next(plants.Count);
-                x_y = plants[rand_ind].Grow(this);
-                if (x_y.Item1 != -1)
+                potentialPlant = plants[rand_ind].Grow();
+                if (potentialPlant != null)
                 {
-                    plants.Add(new Plant(x_y.Item1, x_y.Item2));
-                    map[x_y.Item1, x_y.Item2].on_cell.Add(plants[plants.Count - 1]);
+                    PlantWasMade(potentialPlant);
                     i++;
                 }
             }
         }
+
+        public void PlantWasEaten(int x, int y)
+        {
+            plants.Remove(plants.Find(plant => plant.x == x && plant.y == y));
+            DeletePlantOnCell(x, y);
+        }
+        public void BabyWasMade(Organism baby)
+        {
+            organisms.Add(baby);
+            map[baby.x, baby.y].on_cell.Add(organisms[organisms.Count - 1]);
+        }
+        public void PlantWasMade(Plant plant)
+        {
+            plants.Add(plant);
+            map[plant.x, plant.y].on_cell.Add(plants[plants.Count - 1]);
+        }
+        public void OrganismMadeItsMove(Organism organism)
+        {
+            map[organism.x, organism.y].on_cell.Add(organism);
+        }
+        public void OrganismBecamePlant(Organism organism)
+        {
+            // create plant
+            if (!IsOnCell<Plant>(organism.x, organism.y))
+            {
+                plants.Add(new Plant(organism.x, organism.y, this));
+                map[organism.x, organism.y].on_cell.Add(plants[plants.Count - 1]);
+            }
+
+            // delete org
+            DeleteOrgOnCell(organism);
+            organisms.Remove(organism);
+        }
+        public Organism FindMyPartner(int x, int y, bool mySex)
+        {
+            for (int i = 0; i < map[x, y].on_cell.Count; i++)
+                if (map[x, y].on_cell[i] is Organism)
+                {
+                    Organism potentialPartner = (Organism)map[x, y].on_cell[i];
+                    if (potentialPartner.is_alive && potentialPartner.male != mySex && potentialPartner.wantReproduce)
+                        return potentialPartner;
+                }
+            // should never come to this line actually
+            return null;
+        }
         public Organism GetOrganismOnCell(int x, int y)
         {
             for (int i = 0; i < map[x, y].on_cell.Count; i++)
-            {
                 if (map[x, y].on_cell[i] is Organism)
-                {
                     return (Organism)map[x, y].on_cell[i];
-                }
-            }
             return null;
         }
-        public bool CheckBorders(int x, int y, int cols, int rows)
+        public bool CheckBorders(int x, int y)
         {
             if (x >= 0 && y >= 0 && x < cols && y < rows)
                 return true;
@@ -98,30 +139,16 @@ namespace WindowsFormsApp1
                     Organism isItMe = (Organism)map[me.x, me.y].on_cell[i];
                     if (isItMe.orgID == me.orgID)
                         map[me.x, me.y].on_cell.Remove(map[me.x, me.y].on_cell[i]);
-
                 }
             }
         }
         public void DeletePlantOnCell(int x, int y)
         {
             for (int i = 0; i < map[x, y].on_cell.Count; i++)
-            {
                 if (map[x, y].on_cell[i] is Plant)
-                {
                     map[x, y].on_cell.Remove(map[x, y].on_cell[i]);
-                }
-            }
         }
-        public bool OrganismIsOnCell(int x, int y)
-        {
-            for (int i = 0; i < map[x,y].on_cell.Count; i++)
-            {
-                if (map[x, y].on_cell[i] is Organism)
-                    return true;
-            }
-            return false;
-        }
-        public bool OrganismHasOppositeSex(int x, int y, bool sex, Organism me)
+        public bool OrganismHasOppositeSex(int x, int y, bool sex)
         {
             for (int i = 0; i < map[x, y].on_cell.Count; i++)
                 if (map[x, y].on_cell[i] is Organism)
@@ -130,148 +157,30 @@ namespace WindowsFormsApp1
                     if (potentialPartner.male != sex && potentialPartner.is_alive && potentialPartner.wantReproduce)
                         return true; 
                 }
-
             return false;
         }
-        public bool PlantIsOnCell(int x, int y)
+        public bool IsOnCell<T>(int x, int y)
         {
             for (int i = 0; i < map[x, y].on_cell.Count; i++)
-                if (map[x, y].on_cell[i] is Plant)
+                if (map[x, y].on_cell[i] is T)
                     return true;
             return false;
         }
         public Cell[,] CreateWorld()
         {
-            int x, y;
-            bool male;
-            int orgRange;
-
             // set plants
-            for (int i = 0; i < plantsAmount;)
-            {
-                x = random.Next(cols);
-                y = random.Next(rows);
-                if (map[x, y].on_cell.Count == 0)
-                {
-                    plants.Add(new Plant(x, y));
-                    map[x, y].on_cell.Add(plants[plants.Count - 1]);
-                    i++;
-                }
-            }
-
+            for (int i = 0; i < plantsAmount; i++)
+                PlantWasMade(Plant.RandSpawn(this));
             // set organisms
-            for (int i = 0; i < organismsAmount;)
-            {
-                x = random.Next(cols);
-                y = random.Next(rows);
-                if (random.Next(100) > 50)
-                    male = true;
-                else
-                    male = false;
-                orgRange = minOrgRange + random.Next(minOrgRange);
-
-                if (map[x, y].on_cell.Count == 0)
-                {
-                    organisms.Add(new Organism(x, y, male, lastOrgID++, orgRange, orgRollBackReproduce, orgDeadBeforeBecomingGrass));
-                    map[x, y].on_cell.Add(organisms[organisms.Count - 1]);
-                    i++;
-                }
-            }
-
+            for (int i = 0; i < organismsAmount; i++)
+                BabyWasMade(Organism.RandSpawn(this));
             return map;
-
         }
         public Cell[,] UpdateWorld()
         {
             addPlants();
-
-            int x, y;
-            int direction;
-
             for (int i = organisms.Count - 1; i >= 0; i--)
-            {
-                // surviving ones
-                if (organisms[i].is_alive)
-                {
-                    direction = 0;
-
-                    // eating plants
-                    if (PlantIsOnCell(organisms[i].x, organisms[i].y) && organisms[i].wantFood)
-                    {
-                        organisms[i].EatPlant();
-                        plants.Remove(plants.Find(plant => plant.x == organisms[i].x && plant.y == organisms[i].y));
-                        DeletePlantOnCell(organisms[i].x, organisms[i].y);
-                    }
-
-                    // reproducing
-                    if (OrganismHasOppositeSex(organisms[i].x, organisms[i].y, organisms[i].male, organisms[i]) && organisms[i].wantReproduce)
-                    {
-                        organisms[i].Reproduce();
-
-                        for (int j = 0; j < map[organisms[i].x, organisms[i].y].on_cell.Count; j++)
-                        {
-                            if (map[organisms[i].x, organisms[i].y].on_cell[j] is Organism)
-                            {
-                                Organism Partner = (Organism)map[organisms[i].x, organisms[i].y].on_cell[j];
-                                if (Partner.male != organisms[i].male && Partner.is_alive && Partner.wantReproduce)
-                                {
-                                    Partner.Reproduce();
-                                    break;
-                                }
-                            }
-                        }
-
-                        // creating baby
-                        bool male;
-                        if (random.Next(100) > 50)
-                            male = true;
-                        else
-                            male = false;
-                        int orgRange;
-                        orgRange = minOrgRange + random.Next(minOrgRange);
-                        organisms.Add(new Organism(organisms[i].x, organisms[i].y, male, lastOrgID++, orgRange, orgRollBackReproduce, orgDeadBeforeBecomingGrass));
-                        map[organisms[i].x, organisms[i].y].on_cell.Add(organisms[organisms.Count - 1]);
-                    }
-
-                    // wanna reproduce ones
-                    if (organisms[i].wantReproduce)
-                        direction = organisms[i].CheckPartner(this);
-
-                    // hungry ones
-                    else if (organisms[i].wantFood)
-                        direction = organisms[i].CheckFood(this);
-
-                    if (direction == 0)
-                        direction = random.Next(9);
-
-                    // organism movement
-                    organisms[i].MoveOnMap(direction, this);
-                    organisms[i].MakeMove();
-
-                    // organism made his move on the previous step. Now he is in another cell.
-                    map[organisms[i].x, organisms[i].y].on_cell.Add(organisms[i]);
-                }
-                else
-                {
-                    if (organisms[i].DeadLongEnough())
-                    {
-                        // create plant
-                        if (!PlantIsOnCell(organisms[i].x, organisms[i].y))
-                        {
-                            plants.Add(new Plant(organisms[i].x, organisms[i].y));
-                            map[organisms[i].x, organisms[i].y].on_cell.Add(plants[plants.Count - 1]);
-                        }
-
-                        // delete org
-                        DeleteOrgOnCell(organisms[i]);
-                        organisms.Remove(organisms[i]);
-
-                    }
-
-                }
-
-            }
-
+                organisms[i].NextMove();
             if (timeToChangeDayOrNight())
                 day = !day;
             return map;

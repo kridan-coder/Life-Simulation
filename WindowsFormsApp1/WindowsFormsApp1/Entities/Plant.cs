@@ -7,39 +7,55 @@ using System.Threading.Tasks;
 namespace WindowsFormsApp1
 {
     public class Plant : Entity {
-        public Plant(int _x, int _y):base(_x, _y)
+        public int plantID;
+        private static int lastPlantID;
+        public Plant(int _x, int _y, Map _map):base(_x, _y, _map)
         {
+            plantID = lastPlantID++;
         }
 
-
-        public (int,int) Grow(Map map_)
+        private bool canGrowHere(int x, int y)
         {
-            (int, int) answer = (-1, -1);
-            Plant plant = this;
-            int cols = map_.cols;
-            int rows = map_.rows;
-            Random random = new Random();
-            int direction = random.Next(4);
+            return map.CheckBorders(x, y)
+                && !(map.IsOnCell<Organism>(x, y))
+                && !(map.IsOnCell<Plant>(x, y));
+        }
+        public Plant? Grow()
+        {
+            Direction direction = randomDirection4();
             switch (direction)
             {
-                case 0:
-                    if (map_.CheckBorders(plant.x - 1, plant.y, cols, rows) && !(map_.OrganismIsOnCell(plant.x - 1, plant.y)) && !(map_.PlantIsOnCell(plant.x - 1, plant.y)))
-                        answer = (plant.x - 1, plant.y);
+                case Direction.Left:
+                    if (canGrowHere(x - 1, y))
+                        return new Plant(x - 1, y, map);
                     break;
-                case 1:
-                    if (map_.CheckBorders(plant.x + 1, plant.y, cols, rows) && !(map_.OrganismIsOnCell(plant.x + 1, plant.y)) && !(map_.PlantIsOnCell(plant.x + 1, plant.y)))
-                        answer = (plant.x + 1, plant.y);
+                case Direction.Right:
+                    if (canGrowHere(x + 1, y))
+                        return new Plant(x + 1, y, map);
                     break;
-                case 2:
-                    if (map_.CheckBorders(plant.x, plant.y - 1, cols, rows) && !(map_.OrganismIsOnCell(plant.x, plant.y - 1)) && !(map_.PlantIsOnCell(plant.x, plant.y - 1)))
-                        answer = (plant.x, plant.y - 1);
+                case Direction.Top:
+                    if (canGrowHere(x, y - 1))
+                        return new Plant(x, y - 1, map);
                     break;
-                case 3:
-                    if (map_.CheckBorders(plant.x, plant.y + 1, cols, rows) && !(map_.OrganismIsOnCell(plant.x, plant.y + 1)) && !(map_.PlantIsOnCell(plant.x, plant.y + 1)))
-                        answer = (plant.x, plant.y + 1);
+                case Direction.Bottom:
+                    if (canGrowHere(x, y + 1))
+                        return new Plant(x, y + 1, map);
                     break;
             }
-            return answer;
+            return null;
+        }
+
+        public static Plant RandSpawn(Map map)
+        {
+            int x, y;
+            while(true)
+            {
+                x = map.random.Next(map.cols);
+                y = map.random.Next(map.rows);
+                if (map.map[x, y].on_cell.Count == 0)
+                    return new Plant(x, y, map);
+            }
+
         }
 
     }
