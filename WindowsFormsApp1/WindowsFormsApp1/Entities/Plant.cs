@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace WindowsFormsApp1
 {
     public class Plant : Entity {
@@ -54,7 +55,7 @@ namespace WindowsFormsApp1
         private bool canGrowHere(int x, int y)
         {
             return map.CheckBorders(x, y)
-                && !(map.IsOnCell<Organism>(x, y))
+                && !(map.IsOnCell<Organism<Entity>>(x, y))
                 && !(map.IsOnCell<Plant>(x, y));
         }
     }

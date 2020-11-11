@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using System.Numerics;
 namespace WindowsFormsApp1
 {
-    public class Organism : Entity
+    public abstract class Organism<TFood> : Entity
+        where TFood : Entity
     {
         private static int lastOrgID;
 
@@ -50,10 +51,10 @@ namespace WindowsFormsApp1
                 makeMove(direction);
             }
             else if (deadLongEnough())
-                map.OrganismBecamePlant(this);
+                becomingPlant();
         }
-
-        public static Organism RandSpawn(Map map)
+        public abstract void becomingPlant();
+        public static (int, int, bool, int, int, int) RandSpawnValues(Map map)
         {
             int x, y, orgRange;
             bool male;
@@ -68,28 +69,30 @@ namespace WindowsFormsApp1
                     else
                         male = false;
                     orgRange = map.minOrgRange + map.random.Next(map.minOrgRange);
-                    return new Organism(x, y, male, orgRange, map.orgRollBackReproduce, map.orgDeadBeforeBecomingGrass, map);
+                    return (x, y, male, orgRange, map.orgRollBackReproduce, map.orgDeadBeforeBecomingGrass);
                 }
             }
         }
 
         private void checkFood()
         {
-            if (map.IsOnCell<Plant>(x, y) && wantFood)
+            if (map.IsOnCell<TFood>(x, y) && wantFood)
             {
-                changeValuesOnEatingPlant();
+                changeValuesOnEating();
                 map.PlantWasEaten(x, y);
             }
         }
         private void checkReproduce()
         {
-            if (map.OrganismHasOppositeSex(x, y, male) && wantReproduce)
+            if (wantReproduce && map.OrganismHasOppositeSex<TFood>(x, y, male))
             {
                 changeValuesOnReproduce();
-                map.FindMyPartner(x, y, this.male).changeValuesOnReproduce();
+                map.FindMyPartner<TFood>(x, y, this.male).changeValuesOnReproduce();
                 makeBaby();
             }
         }
+
+        public abstract void makeBaby();
         private void makeMove(Direction direction)
         {
             map.DeleteOrgOnCell(this);
@@ -100,15 +103,15 @@ namespace WindowsFormsApp1
         private Direction makeDecision(Direction direction)
         {
             if (wantReproduce)
-                direction = chooseDirection(FindOnMap<Organism>(true, this.male));
+                direction = chooseDirection(FindOnMap<Organism<TFood>>(true, this.male));
             else if (wantFood)
-                direction = chooseDirection(FindOnMap<Plant>(false, null));
+                direction = chooseDirection(FindOnMap<TFood>(false, null));
             // no idea what to do
             if (direction == Direction.None)
                 direction = randomDirection8();
             return direction;
         }
-        private void makeBaby()
+        public (int, int, bool, int, int, int) MakeBabyValues()
         {
             bool babyMale;
             int babyRange;
@@ -117,7 +120,7 @@ namespace WindowsFormsApp1
             else
                 babyMale = false;
             babyRange = map.minOrgRange + map.random.Next(map.minOrgRange);
-            map.BabyWasMade(new Organism(x, y, babyMale, babyRange, map.orgRollBackReproduce, map.orgDeadBeforeBecomingGrass, map));
+            return (x, y, babyMale, babyRange, map.orgRollBackReproduce, map.orgDeadBeforeBecomingGrass);
         }
         private int setActualRange()
         {
@@ -127,7 +130,7 @@ namespace WindowsFormsApp1
         {
             return map.CheckBorders(x, y)
                 && map.IsOnCell<T>(x, y)
-                && ((findingPartner) ? map.OrganismHasOppositeSex(x, y, (bool)sex) : true);
+                && ((findingPartner) ? map.OrganismHasOppositeSex<TFood>(x, y, (bool)sex) : true);
         }
         private (int, int)? checkLines<T>(int range, bool findingPartner, bool? sex)
         {
@@ -284,7 +287,7 @@ namespace WindowsFormsApp1
             reproducedFor = 0;
             wantReproduce = false;
         }
-        private void changeValuesOnEatingPlant()
+        private void changeValuesOnEating()
         {
             fullness = 100;
             wantFood = false;

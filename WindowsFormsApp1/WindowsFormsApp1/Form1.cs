@@ -23,7 +23,7 @@ namespace WindowsFormsApp1
         }
 
         Runner runner;
-        Organism observedOrganism;
+        Organism<Entity> observedOrganism;
         private Graphics graphics;
         int resolution;
 
@@ -175,7 +175,7 @@ namespace WindowsFormsApp1
             pictureBox1.Image = new Bitmap(runner.Cols() * (int)resolutionUpDown.Value, runner.Rows() * (int)resolutionUpDown.Value);
             graphics = Graphics.FromImage(pictureBox1.Image);
         }
-        public void DrawCanvas(List<Plant> plants, List<Organism> organisms, bool day)
+        public void DrawCanvas(List<Plant> plants, List<Herbivore> herbivores, List<Predatory> predators, List<Omnivore> omnivores, bool day)
         {
 
             if (resolution != (int)resolutionUpDown.Value)
@@ -191,19 +191,46 @@ namespace WindowsFormsApp1
             foreach (var plant in plants)
                 graphics.FillRectangle(Brushes.YellowGreen, plant.x * (int)resolutionUpDown.Value, plant.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
 
-            // show orgs
-            foreach (var organism in organisms)
+            // show herbivores
+            foreach (var herbivore in herbivores)
             {
-                if (organism.is_alive)
+                if (herbivore.is_alive)
                 {
-                    if (organism.male)
-                        graphics.FillEllipse(Brushes.SlateBlue, organism.x * (int)resolutionUpDown.Value, organism.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    if (herbivore.male)
+                        graphics.FillEllipse(Brushes.SlateBlue, herbivore.x * (int)resolutionUpDown.Value, herbivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                     else
-                        graphics.FillEllipse(Brushes.MediumVioletRed, organism.x * (int)resolutionUpDown.Value, organism.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                        graphics.FillEllipse(Brushes.MediumVioletRed, herbivore.x * (int)resolutionUpDown.Value, herbivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                 }
                 else
-                    graphics.FillEllipse(Brushes.Gray, organism.x * (int)resolutionUpDown.Value, organism.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    graphics.FillEllipse(Brushes.Gray, herbivore.x * (int)resolutionUpDown.Value, herbivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+            }
 
+            // show predators
+            foreach (var predator in predators)
+            {
+                if (predator.is_alive)
+                {
+                    if (predator.male)
+                        graphics.FillEllipse(Brushes.DarkRed, predator.x * (int)resolutionUpDown.Value, predator.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    else
+                        graphics.FillEllipse(Brushes.Red, predator.x * (int)resolutionUpDown.Value, predator.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                }
+                else
+                    graphics.FillEllipse(Brushes.Gray, predator.x * (int)resolutionUpDown.Value, predator.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+            }
+
+            // show omnivores
+            foreach (var omnivore in omnivores)
+            {
+                if (omnivore.is_alive)
+                {
+                    if (omnivore.male)
+                        graphics.FillEllipse(Brushes.Brown, omnivore.x * (int)resolutionUpDown.Value, omnivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    else
+                        graphics.FillEllipse(Brushes.RosyBrown, omnivore.x * (int)resolutionUpDown.Value, omnivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                }
+                else
+                    graphics.FillEllipse(Brushes.Gray, omnivore.x * (int)resolutionUpDown.Value, omnivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
             }
 
             refreshInfoAboutObservedOrganism();
