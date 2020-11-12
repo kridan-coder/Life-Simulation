@@ -50,6 +50,12 @@
   <ItemGroup>
     <Compile Include="Entities\Directions.cs" />
     <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\Edible\Edible.cs" />
+    <Compile Include="Entities\Edible\EdibleForPredatory.cs" />
+    <Compile Include="Entities\Edible\EdibleForHerbivore.cs" />
+    <Compile Include="Entities\Edible\EdibleForOmnivore.cs" />
+    <Compile Include="Entities\Meteorite\MeteoriteShard.cs" />
+    <Compile Include="Entities\Meteorite\Meteorite.cs" />
     <Compile Include="Entities\Organisms\Herbivore.cs" />
     <Compile Include="Entities\Organisms\Omnivore.cs" />
     <Compile Include="Entities\Organisms\Organism.cs" />

@@ -11,9 +11,9 @@ namespace WindowsFormsApp1
         public Cell()
         {
 #nullable enable
-            on_cell = new List<Entity?>();
+            OnCell = new List<Entity?>();
         }
 #nullable enable
-        public List<Entity?> on_cell;
+        public List<Entity?> OnCell;
     }
 }

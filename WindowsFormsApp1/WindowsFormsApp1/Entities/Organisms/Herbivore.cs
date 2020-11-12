@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace WindowsFormsApp1
 {
     // травоядное
-    public class Herbivore : Organism<Plant>
+    public class Herbivore : Organism<Plant>, EdibleForPredatory, EdibleForOmnivore
     {
         public Herbivore(int _x, int _y, bool _male, int _range, int _rollBack, int _deadUntil, Map _map) : base(_x, _y, _male, _range, _rollBack, _deadUntil, _map)
         {
@@ -23,6 +23,16 @@ namespace WindowsFormsApp1
         public override void becomingPlant()
         {
             map.HerbivoreBecamePlant(this);
+        }
+
+        public override void EatFood()
+        {
+            map.PlantWasEaten(x, y);
+        }
+
+        public override Direction finalDecision(Direction direction)
+        {
+            return (map.random.Next(100) < 15) ? Direction.None : direction;
         }
 
         public override void makeBaby()

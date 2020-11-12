@@ -9,18 +9,18 @@ namespace WindowsFormsApp1
 {
     public class Runner
     {
-        private const int herbivores = 1;
-        private const int predators = 1;
+        private const int herbivores = 100;
+        private const int predators = 25;
 
-        private const int minOrgRange = 50;
+        private const int minOrgRange = 25;
         private const int orgRollBackReproduce = 150;
         private const int orgDeadBeforeBecomingGrass = 100;
 
-        private const int plants = 0;
-        private const int plantsGrowth = 0;
+        private const int plants = 350;
+        private const int plantsGrowth = 10;
 
-        private const int rows = 20;
-        private const int cols = 20;
+        private const int rows = 100;
+        private const int cols = 100;
 
         private const int dayNightChange = 50;
 
@@ -46,17 +46,25 @@ namespace WindowsFormsApp1
             map = new Map(herbivores, predators, plants, plantsGrowth, rows, cols, dayNightChange, minOrgRange, orgRollBackReproduce, orgDeadBeforeBecomingGrass);
             form1.InitGraphics();
             map.CreateWorld();
-            form1.DrawCanvas(map.plants, map.herbivores, map.predators, map.omnivores, map.day);
+            form1.DrawCanvas(map.plants, map.herbivores, map.predators, map.omnivores, map.meteorite.meteoriteShards, map.day);
             form1.StartTimer();
         }
         public void NextTick()
         {
             map.UpdateWorld();
-            form1.DrawCanvas(map.plants, map.herbivores, map.predators, map.omnivores, map.day);
+            form1.DrawCanvas(map.plants, map.herbivores, map.predators, map.omnivores, map.meteorite.meteoriteShards, map.day);
         }
-        public Organism<Entity> GetOrganism(int x, int y)
+        public Herbivore TryToGetHerbivore(int x, int y)
         {
-            return map.GetOrganismOnCell(x, y);
+            return map.GetHerbivoreOnCell(x, y);
+        }
+        public Omnivore TryToGetOmnivore(int x, int y)
+        {
+            return map.GetOmnivoreOnCell(x, y);
+        }
+        public Predatory TryToGetPredatory(int x, int y)
+        {
+            return map.GetPredatoryOnCell(x, y);
         }
         public bool IsItDayToday()
         {

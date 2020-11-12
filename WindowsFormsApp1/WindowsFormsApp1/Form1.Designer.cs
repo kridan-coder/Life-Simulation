@@ -58,6 +58,10 @@
             this.madeByLabel = new System.Windows.Forms.Label();
             this.resolutionUpDown = new System.Windows.Forms.NumericUpDown();
             this.resolutionLabel = new System.Windows.Forms.Label();
+            this.labelFullnessInfo = new System.Windows.Forms.Label();
+            this.labelWantEat = new System.Windows.Forms.Label();
+            this.labelTypeOfFoodInfo = new System.Windows.Forms.Label();
+            this.labelAnimal = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -93,6 +97,10 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.labelAnimal);
+            this.splitContainer1.Panel1.Controls.Add(this.labelTypeOfFoodInfo);
+            this.splitContainer1.Panel1.Controls.Add(this.labelWantEat);
+            this.splitContainer1.Panel1.Controls.Add(this.labelFullnessInfo);
             this.splitContainer1.Panel1.Controls.Add(this.orgIDLabel);
             this.splitContainer1.Panel1.Controls.Add(this.organismIDInfoLabel);
             this.splitContainer1.Panel1.Controls.Add(this.organismVisionLabel);
@@ -133,7 +141,7 @@
             // 
             this.orgIDLabel.AutoSize = true;
             this.orgIDLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.orgIDLabel.Location = new System.Drawing.Point(115, 568);
+            this.orgIDLabel.Location = new System.Drawing.Point(115, 616);
             this.orgIDLabel.Name = "orgIDLabel";
             this.orgIDLabel.Size = new System.Drawing.Size(35, 15);
             this.orgIDLabel.TabIndex = 26;
@@ -142,7 +150,7 @@
             // organismIDInfoLabel
             // 
             this.organismIDInfoLabel.AutoSize = true;
-            this.organismIDInfoLabel.Location = new System.Drawing.Point(31, 568);
+            this.organismIDInfoLabel.Location = new System.Drawing.Point(31, 616);
             this.organismIDInfoLabel.Name = "organismIDInfoLabel";
             this.organismIDInfoLabel.Size = new System.Drawing.Size(79, 15);
             this.organismIDInfoLabel.TabIndex = 25;
@@ -152,7 +160,7 @@
             // 
             this.organismVisionLabel.AutoSize = true;
             this.organismVisionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.organismVisionLabel.Location = new System.Drawing.Point(170, 542);
+            this.organismVisionLabel.Location = new System.Drawing.Point(170, 590);
             this.organismVisionLabel.Name = "organismVisionLabel";
             this.organismVisionLabel.Size = new System.Drawing.Size(35, 15);
             this.organismVisionLabel.TabIndex = 24;
@@ -161,7 +169,7 @@
             // organismVisionRangeInfoLabel
             // 
             this.organismVisionRangeInfoLabel.AutoSize = true;
-            this.organismVisionRangeInfoLabel.Location = new System.Drawing.Point(31, 542);
+            this.organismVisionRangeInfoLabel.Location = new System.Drawing.Point(31, 590);
             this.organismVisionRangeInfoLabel.Name = "organismVisionRangeInfoLabel";
             this.organismVisionRangeInfoLabel.Size = new System.Drawing.Size(133, 15);
             this.organismVisionRangeInfoLabel.TabIndex = 23;
@@ -171,7 +179,7 @@
             // 
             this.DayOrNightLabel.AutoSize = true;
             this.DayOrNightLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.DayOrNightLabel.Location = new System.Drawing.Point(29, 623);
+            this.DayOrNightLabel.Location = new System.Drawing.Point(29, 662);
             this.DayOrNightLabel.Name = "DayOrNightLabel";
             this.DayOrNightLabel.Size = new System.Drawing.Size(0, 25);
             this.DayOrNightLabel.TabIndex = 22;
@@ -180,7 +188,7 @@
             // 
             this.labelReproduce.AutoSize = true;
             this.labelReproduce.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelReproduce.Location = new System.Drawing.Point(194, 463);
+            this.labelReproduce.Location = new System.Drawing.Point(100, 502);
             this.labelReproduce.Name = "labelReproduce";
             this.labelReproduce.Size = new System.Drawing.Size(35, 15);
             this.labelReproduce.TabIndex = 21;
@@ -189,7 +197,7 @@
             // labelReproduceInfo
             // 
             this.labelReproduceInfo.AutoSize = true;
-            this.labelReproduceInfo.Location = new System.Drawing.Point(162, 448);
+            this.labelReproduceInfo.Location = new System.Drawing.Point(102, 487);
             this.labelReproduceInfo.Name = "labelReproduceInfo";
             this.labelReproduceInfo.Size = new System.Drawing.Size(107, 15);
             this.labelReproduceInfo.TabIndex = 20;
@@ -226,7 +234,7 @@
             // 
             this.positionYLabel.AutoSize = true;
             this.positionYLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.positionYLabel.Location = new System.Drawing.Point(232, 518);
+            this.positionYLabel.Location = new System.Drawing.Point(232, 566);
             this.positionYLabel.Name = "positionYLabel";
             this.positionYLabel.Size = new System.Drawing.Size(35, 15);
             this.positionYLabel.TabIndex = 16;
@@ -236,7 +244,7 @@
             // 
             this.positionXLabel.AutoSize = true;
             this.positionXLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.positionXLabel.Location = new System.Drawing.Point(102, 518);
+            this.positionXLabel.Location = new System.Drawing.Point(102, 566);
             this.positionXLabel.Name = "positionXLabel";
             this.positionXLabel.Size = new System.Drawing.Size(35, 15);
             this.positionXLabel.TabIndex = 15;
@@ -246,7 +254,7 @@
             // 
             this.hungerLabel.AutoSize = true;
             this.hungerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.hungerLabel.Location = new System.Drawing.Point(88, 463);
+            this.hungerLabel.Location = new System.Drawing.Point(31, 463);
             this.hungerLabel.Name = "hungerLabel";
             this.hungerLabel.Size = new System.Drawing.Size(35, 15);
             this.hungerLabel.TabIndex = 14;
@@ -256,7 +264,7 @@
             // 
             this.sexLabel.AutoSize = true;
             this.sexLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.sexLabel.Location = new System.Drawing.Point(68, 448);
+            this.sexLabel.Location = new System.Drawing.Point(31, 502);
             this.sexLabel.Name = "sexLabel";
             this.sexLabel.Size = new System.Drawing.Size(35, 15);
             this.sexLabel.TabIndex = 13;
@@ -265,7 +273,7 @@
             // animalInfoPositionYLabel
             // 
             this.animalInfoPositionYLabel.AutoSize = true;
-            this.animalInfoPositionYLabel.Location = new System.Drawing.Point(162, 518);
+            this.animalInfoPositionYLabel.Location = new System.Drawing.Point(162, 566);
             this.animalInfoPositionYLabel.Name = "animalInfoPositionYLabel";
             this.animalInfoPositionYLabel.Size = new System.Drawing.Size(64, 15);
             this.animalInfoPositionYLabel.TabIndex = 12;
@@ -274,7 +282,7 @@
             // animalInfoPositionXLabel
             // 
             this.animalInfoPositionXLabel.AutoSize = true;
-            this.animalInfoPositionXLabel.Location = new System.Drawing.Point(31, 518);
+            this.animalInfoPositionXLabel.Location = new System.Drawing.Point(31, 566);
             this.animalInfoPositionXLabel.Name = "animalInfoPositionXLabel";
             this.animalInfoPositionXLabel.Size = new System.Drawing.Size(65, 15);
             this.animalInfoPositionXLabel.TabIndex = 11;
@@ -283,7 +291,7 @@
             // animalInfoSexLabel
             // 
             this.animalInfoSexLabel.AutoSize = true;
-            this.animalInfoSexLabel.Location = new System.Drawing.Point(31, 448);
+            this.animalInfoSexLabel.Location = new System.Drawing.Point(31, 487);
             this.animalInfoSexLabel.Name = "animalInfoSexLabel";
             this.animalInfoSexLabel.Size = new System.Drawing.Size(31, 15);
             this.animalInfoSexLabel.TabIndex = 10;
@@ -292,7 +300,7 @@
             // animalInfoHungerLabel
             // 
             this.animalInfoHungerLabel.AutoSize = true;
-            this.animalInfoHungerLabel.Location = new System.Drawing.Point(31, 463);
+            this.animalInfoHungerLabel.Location = new System.Drawing.Point(31, 448);
             this.animalInfoHungerLabel.Name = "animalInfoHungerLabel";
             this.animalInfoHungerLabel.Size = new System.Drawing.Size(51, 15);
             this.animalInfoHungerLabel.TabIndex = 9;
@@ -399,6 +407,44 @@
             this.resolutionLabel.TabIndex = 0;
             this.resolutionLabel.Text = "Resolution";
             // 
+            // labelFullnessInfo
+            // 
+            this.labelFullnessInfo.AutoSize = true;
+            this.labelFullnessInfo.Location = new System.Drawing.Point(102, 448);
+            this.labelFullnessInfo.Name = "labelFullnessInfo";
+            this.labelFullnessInfo.Size = new System.Drawing.Size(71, 15);
+            this.labelFullnessInfo.TabIndex = 27;
+            this.labelFullnessInfo.Text = "Want to eat:";
+            // 
+            // labelWantEat
+            // 
+            this.labelWantEat.AutoSize = true;
+            this.labelWantEat.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelWantEat.Location = new System.Drawing.Point(100, 463);
+            this.labelWantEat.Name = "labelWantEat";
+            this.labelWantEat.Size = new System.Drawing.Size(35, 15);
+            this.labelWantEat.TabIndex = 28;
+            this.labelWantEat.Text = "none";
+            // 
+            // labelTypeOfFoodInfo
+            // 
+            this.labelTypeOfFoodInfo.AutoSize = true;
+            this.labelTypeOfFoodInfo.Location = new System.Drawing.Point(229, 448);
+            this.labelTypeOfFoodInfo.Name = "labelTypeOfFoodInfo";
+            this.labelTypeOfFoodInfo.Size = new System.Drawing.Size(48, 15);
+            this.labelTypeOfFoodInfo.TabIndex = 29;
+            this.labelTypeOfFoodInfo.Text = "Animal:";
+            // 
+            // labelAnimal
+            // 
+            this.labelAnimal.AutoSize = true;
+            this.labelAnimal.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelAnimal.Location = new System.Drawing.Point(229, 463);
+            this.labelAnimal.Name = "labelAnimal";
+            this.labelAnimal.Size = new System.Drawing.Size(35, 15);
+            this.labelAnimal.TabIndex = 30;
+            this.labelAnimal.Text = "none";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -453,6 +499,10 @@
         private System.Windows.Forms.Label organismVisionLabel;
         private System.Windows.Forms.Label organismIDInfoLabel;
         private System.Windows.Forms.Label orgIDLabel;
+        private System.Windows.Forms.Label labelAnimal;
+        private System.Windows.Forms.Label labelTypeOfFoodInfo;
+        private System.Windows.Forms.Label labelWantEat;
+        private System.Windows.Forms.Label labelFullnessInfo;
     }
 }
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
 {
-    public class Plant : Entity {
+    public class Plant : Entity, EdibleForHerbivore, EdibleForOmnivore {
         public int plantID;
         private static int lastPlantID;
         public Plant(int _x, int _y, Map _map):base(_x, _y, _map)
@@ -47,7 +47,7 @@ namespace WindowsFormsApp1
             {
                 x = map.random.Next(map.cols);
                 y = map.random.Next(map.rows);
-                if (map.map[x, y].on_cell.Count == 0)
+                if (map.map[x, y].OnCell.Count == 0)
                     return new Plant(x, y, map);
             }
         }
@@ -55,7 +55,7 @@ namespace WindowsFormsApp1
         private bool canGrowHere(int x, int y)
         {
             return map.CheckBorders(x, y)
-                && !(map.IsOnCell<Organism<Entity>>(x, y))
+                && !(map.IsOnCell<Organism<Edible>>(x, y))
                 && !(map.IsOnCell<Plant>(x, y));
         }
     }

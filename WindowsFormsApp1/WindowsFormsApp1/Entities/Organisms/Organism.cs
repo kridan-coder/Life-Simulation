@@ -7,11 +7,11 @@ using System.Numerics;
 namespace WindowsFormsApp1
 {
     public abstract class Organism<TFood> : Entity
-        where TFood : Entity
+        where TFood : Edible
     {
         private static int lastOrgID;
 
-        public bool is_alive;
+        public bool isAlive;
 
         public int orgID;
 
@@ -36,14 +36,14 @@ namespace WindowsFormsApp1
             organismRange = _range;
             deadUntil = _deadUntil;
             noReproduceUntil = _rollBack;
-            is_alive = true;
+            isAlive = true;
         }
 
         // main function called by map
         public void NextMove()
         {
             Direction direction = Direction.None;
-            if (is_alive)
+            if (isAlive)
             {
                 checkFood();
                 checkReproduce();
@@ -62,7 +62,7 @@ namespace WindowsFormsApp1
             {
                 x = map.random.Next(map.cols);
                 y = map.random.Next(map.rows);
-                if (map.map[x, y].on_cell.Count == 0)
+                if (map.map[x, y].OnCell.Count == 0)
                 {
                     if (map.random.Next(100) > 50)
                         male = true;
@@ -79,9 +79,12 @@ namespace WindowsFormsApp1
             if (map.IsOnCell<TFood>(x, y) && wantFood)
             {
                 changeValuesOnEating();
-                map.PlantWasEaten(x, y);
+                EatFood();
             }
         }
+
+        public abstract void EatFood();
+
         private void checkReproduce()
         {
             if (wantReproduce && map.OrganismHasOppositeSex<TFood>(x, y, male))
@@ -109,8 +112,11 @@ namespace WindowsFormsApp1
             // no idea what to do
             if (direction == Direction.None)
                 direction = randomDirection8();
+            direction = finalDecision(direction);
             return direction;
         }
+
+        public abstract Direction finalDecision(Direction direction);
         public (int, int, bool, int, int, int) MakeBabyValues()
         {
             bool babyMale;
@@ -250,7 +256,7 @@ namespace WindowsFormsApp1
         // check if alive and increment deadFor counter if needed
         private bool deadLongEnough()
         {
-            if (!is_alive && deadFor >= deadUntil)
+            if (!isAlive && deadFor >= deadUntil)
                 return true;
             else
                 deadFor++;
@@ -260,7 +266,7 @@ namespace WindowsFormsApp1
         {
             if (fullness <= 0)
             {
-                is_alive = false;
+                isAlive = false;
             }
             else if (fullness <= 10 && wantReproduce)
             {
@@ -268,7 +274,7 @@ namespace WindowsFormsApp1
                 wantFood = true;
                 fullness--;
             }
-            else if (fullness < 50)
+            else if (fullness < 50 && !wantReproduce)
             {
                 wantFood = true;
                 fullness--;
@@ -277,7 +283,10 @@ namespace WindowsFormsApp1
             {
                 fullness--;
                 if (reproducedFor >= noReproduceUntil)
+                {
                     wantReproduce = true;
+                    wantFood = false;
+                }
                 else
                     reproducedFor++;
             }

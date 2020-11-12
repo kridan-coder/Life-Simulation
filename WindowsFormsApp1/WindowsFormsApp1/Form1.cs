@@ -23,7 +23,10 @@ namespace WindowsFormsApp1
         }
 
         Runner runner;
-        Organism<Entity> observedOrganism;
+        Herbivore observedHerbivore = null;
+        Omnivore observedOmnivore = null;
+        Predatory observedPredatory = null;
+        
         private Graphics graphics;
         int resolution;
 
@@ -32,81 +35,104 @@ namespace WindowsFormsApp1
         {
             timer1.Start();
         }
-        private void getInfoAboutObservedOrganism(int x, int y)
+
+        private void paintOrg(int x, int y, bool isAlive, bool male, Brush ifMale, Brush ifFemale, Brush ifDead)
         {
-            // no need for old one
-            if (observedOrganism != null)
+            if (isAlive)
             {
-                if (observedOrganism.is_alive)
-                {
-                    if (observedOrganism.male)
-                        graphics.FillEllipse(Brushes.SlateBlue, observedOrganism.x * (int)resolutionUpDown.Value, observedOrganism.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-                    else
-                        graphics.FillEllipse(Brushes.MediumVioletRed, observedOrganism.x * (int)resolutionUpDown.Value, observedOrganism.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-                }
+                if (male)
+                    graphics.FillEllipse(ifMale, x * (int)resolutionUpDown.Value, y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                 else
-                    graphics.FillEllipse(Brushes.Gray, observedOrganism.x * (int)resolutionUpDown.Value, observedOrganism.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    graphics.FillEllipse(ifFemale, x * (int)resolutionUpDown.Value, y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
             }
+            else
+                graphics.FillEllipse(ifDead, x * (int)resolutionUpDown.Value, y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+        }
+        private void paintObservedOrg(int x, int y)
+        {
+            graphics.FillEllipse(Brushes.DarkOrange, x * (int)resolutionUpDown.Value, y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+            pictureBox1.Refresh();
+        }
 
-            observedOrganism = runner.GetOrganism(x, y);
-            if (observedOrganism != null)
+        private void clearOldObservedOrganisms()
+        {
+            if (observedHerbivore != null)
+                paintOrg(observedHerbivore.x, observedHerbivore.y, observedHerbivore.isAlive, observedHerbivore.male, Brushes.DarkBlue, Brushes.SlateBlue, Brushes.LightGray);
+            if (observedOmnivore != null)
+                paintOrg(observedOmnivore.x, observedOmnivore.y, observedOmnivore.isAlive, observedOmnivore.male, Brushes.DarkViolet, Brushes.Violet, Brushes.Gray);
+            if (observedPredatory != null)
+                paintOrg(observedPredatory.x, observedPredatory.y, observedPredatory.isAlive, observedPredatory.male, Brushes.DarkRed, Brushes.Red, Brushes.DarkGray);
+
+        }
+
+        private void refreshOrgShowingInfo(bool alive, bool male, bool wantReproduce, bool wantFood, int fullness, int x, int y, int ID, int visionRange, int deadUntil, int deadFor, string animalType)
+        {
+            sexLabel.Text = $"{((male) ? "Male" : "Female") }";
+            hungerLabel.Text = $"{fullness.ToString()}";
+            labelAnimal.Text = animalType;
+            positionXLabel.Text = $"{x.ToString()}";
+            positionYLabel.Text = $"{y.ToString()}";
+            orgIDLabel.Text = $"{ID.ToString()}";
+            if (alive)
             {
-                sexLabel.Text = $"{((observedOrganism.male == true) ? "Male" : "Female") }";
+                labelReproduce.Text = $"{wantReproduce.ToString()}";
+                labelWantEat.Text = $"{wantFood.ToString()}";
+                deadOrAliveLabel.Text = "Alive";
+                labelInfoBecomeGrass.Text = "";
+                labelBecomeGrass.Text = "";
+                organismVisionLabel.Text = $"{((runner.IsItDayToday()) ? visionRange.ToString() : (visionRange / 2).ToString()) }";
+            }
+            else
+            {
+                organismVisionLabel.Text = "0";
+                labelReproduce.Text = "Bruh";
+                labelWantEat.Text = "Bruh";
                 deadOrAliveLabel.Text = "Dead";
-                hungerLabel.Text = $"{observedOrganism.fullness.ToString()}";
-                positionXLabel.Text = $"{observedOrganism.x.ToString()}";
-                positionYLabel.Text = $"{observedOrganism.y.ToString()}";
-                orgIDLabel.Text = $"{observedOrganism.orgID.ToString()}";
-                if (observedOrganism.is_alive)
-                {
-                    labelReproduce.Text = $"{observedOrganism.wantReproduce.ToString()}";
-                    deadOrAliveLabel.Text = "Alive";
-                    labelInfoBecomeGrass.Text = "";
-                    labelBecomeGrass.Text = "";
-                    organismVisionLabel.Text = $"{((runner.IsItDayToday()) ? observedOrganism.organismRange.ToString() : (observedOrganism.organismRange / 2).ToString()) }";
-                }
-                else
-                {
-                    organismVisionLabel.Text = "0";
-                    labelReproduce.Text = "Bruh";
-                    deadOrAliveLabel.Text = "Dead";
-                    labelInfoBecomeGrass.Text = "Become grass in: ";
-                    labelBecomeGrass.Text = $"{(observedOrganism.deadUntil - observedOrganism.deadFor).ToString()}";
-                }
+                labelInfoBecomeGrass.Text = "Become grass in: ";
+                labelBecomeGrass.Text = $"{(deadUntil - deadFor).ToString()}";
+            }
+            paintObservedOrg(x,y);
 
-                graphics.FillEllipse(Brushes.DarkOrange, observedOrganism.x * (int)resolutionUpDown.Value, observedOrganism.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-                pictureBox1.Refresh();
+        }
 
+
+        private void getInfoAboutObservedHerbivore(int x, int y)
+        {
+            // no need for old ones
+            clearOldObservedOrganisms();
+            observedHerbivore = runner.TryToGetHerbivore(x, y);
+            if (observedHerbivore != null)
+            {
+                observedOmnivore = null;
+                observedPredatory = null;
+                refreshOrgShowingInfo(observedHerbivore.isAlive, observedHerbivore.male, observedHerbivore.wantReproduce, observedHerbivore.wantFood, observedHerbivore.fullness, observedHerbivore.x, observedHerbivore.y, observedHerbivore.orgID, observedHerbivore.organismRange, observedHerbivore.deadUntil, observedHerbivore.deadFor, "Herbivore");
+                paintObservedOrg(x, y);
             }
         }
-        private void refreshInfoAboutObservedOrganism()
+        private void getInfoAboutObservedOmnivore(int x, int y)
         {
-            if (observedOrganism != null)
+            // no need for old ones
+            clearOldObservedOrganisms();
+            observedOmnivore = runner.TryToGetOmnivore(x, y);
+            if (observedOmnivore != null)
             {
-                sexLabel.Text = $"{((observedOrganism.male == true) ? "Male" : "Female") }";
-                deadOrAliveLabel.Text = "Dead";
-                hungerLabel.Text = $"{observedOrganism.fullness.ToString()}";
-                positionXLabel.Text = $"{observedOrganism.x.ToString()}";
-                positionYLabel.Text = $"{observedOrganism.y.ToString()}";
-                orgIDLabel.Text = $"{observedOrganism.orgID.ToString()}";
-                if (observedOrganism.is_alive)
-                {
-                    labelReproduce.Text = $"{observedOrganism.wantReproduce.ToString()}";
-                    deadOrAliveLabel.Text = "Alive";
-                    labelInfoBecomeGrass.Text = "";
-                    labelBecomeGrass.Text = "";
-                    organismVisionLabel.Text = $"{((runner.IsItDayToday()) ? observedOrganism.organismRange.ToString() : (observedOrganism.organismRange / 2).ToString()) }";
-                }
-                else
-                {
-                    organismVisionLabel.Text = "0";
-                    labelReproduce.Text = "Bruh";
-                    deadOrAliveLabel.Text = "Dead";
-                    labelInfoBecomeGrass.Text = "Become grass in: ";
-                    labelBecomeGrass.Text = $"{(observedOrganism.deadUntil - observedOrganism.deadFor).ToString()}";
-                }
-
-                graphics.FillEllipse(Brushes.DarkOrange, observedOrganism.x * (int)resolutionUpDown.Value, observedOrganism.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                observedHerbivore = null;
+                observedPredatory = null;
+                refreshOrgShowingInfo(observedOmnivore.isAlive, observedOmnivore.male, observedOmnivore.wantReproduce, observedOmnivore.wantFood, observedOmnivore.fullness, observedOmnivore.x, observedOmnivore.y, observedOmnivore.orgID, observedOmnivore.organismRange, observedOmnivore.deadUntil, observedOmnivore.deadFor, "Omnivore");
+                paintObservedOrg(x, y);
+            }
+        }
+        private void getInfoAboutObservedPredatory(int x, int y)
+        {
+            // no need for old ones
+            clearOldObservedOrganisms();
+            observedPredatory = runner.TryToGetPredatory(x, y);
+            if (observedPredatory != null)
+            {
+                observedHerbivore = null;
+                observedOmnivore = null;
+                refreshOrgShowingInfo(observedPredatory.isAlive, observedPredatory.male, observedPredatory.wantReproduce, observedPredatory.wantFood, observedPredatory.fullness, observedPredatory.x, observedPredatory.y, observedPredatory.orgID, observedPredatory.organismRange, observedPredatory.deadUntil, observedPredatory.deadFor, "Predatory");
+                paintObservedOrg(x, y);
             }
         }
         private void refreshInfoAboutDay()
@@ -166,7 +192,10 @@ namespace WindowsFormsApp1
             {
                 int x = e.Location.X / resolution;
                 int y = e.Location.Y / resolution;
-                getInfoAboutObservedOrganism(x, y);
+                getInfoAboutObservedHerbivore(x, y);
+                getInfoAboutObservedOmnivore(x, y);
+                getInfoAboutObservedPredatory(x, y);
+
             }
         }
         public void InitGraphics()
@@ -175,7 +204,7 @@ namespace WindowsFormsApp1
             pictureBox1.Image = new Bitmap(runner.Cols() * (int)resolutionUpDown.Value, runner.Rows() * (int)resolutionUpDown.Value);
             graphics = Graphics.FromImage(pictureBox1.Image);
         }
-        public void DrawCanvas(List<Plant> plants, List<Herbivore> herbivores, List<Predatory> predators, List<Omnivore> omnivores, bool day)
+        public void DrawCanvas(List<Plant> plants, List<Herbivore> herbivores, List<Predatory> predators, List<Omnivore> omnivores, List<MeteoriteShard> shards, bool day)
         {
 
             if (resolution != (int)resolutionUpDown.Value)
@@ -185,55 +214,53 @@ namespace WindowsFormsApp1
             if (day)
                 graphics.Clear(Color.Cornsilk);
             else
-                graphics.Clear(Color.DimGray);
+                graphics.Clear(Color.DarkSlateBlue);
+
+            // show shards
+            foreach (var shard in shards)
+            {
+                if (!shard.meteorite.hasFallen)
+                {
+                    graphics.FillRectangle(Brushes.Black, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                }
+                else if (shard.meteorite.hasFallen && !shard.meteorite.becameCold)
+                {
+                    graphics.FillRectangle(Brushes.Orange, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                }
+                else if (shard.meteorite.becameCold)
+                {
+                    graphics.FillRectangle(Brushes.DarkCyan, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                }
+            }
 
             // show plants
             foreach (var plant in plants)
                 graphics.FillRectangle(Brushes.YellowGreen, plant.x * (int)resolutionUpDown.Value, plant.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
 
+
+
             // show herbivores
             foreach (var herbivore in herbivores)
-            {
-                if (herbivore.is_alive)
-                {
-                    if (herbivore.male)
-                        graphics.FillEllipse(Brushes.SlateBlue, herbivore.x * (int)resolutionUpDown.Value, herbivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-                    else
-                        graphics.FillEllipse(Brushes.MediumVioletRed, herbivore.x * (int)resolutionUpDown.Value, herbivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-                }
-                else
-                    graphics.FillEllipse(Brushes.Gray, herbivore.x * (int)resolutionUpDown.Value, herbivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-            }
+                paintOrg(herbivore.x, herbivore.y, herbivore.isAlive, herbivore.male, Brushes.DarkBlue, Brushes.SlateBlue, Brushes.LightGray);
+
 
             // show predators
             foreach (var predator in predators)
-            {
-                if (predator.is_alive)
-                {
-                    if (predator.male)
-                        graphics.FillEllipse(Brushes.DarkRed, predator.x * (int)resolutionUpDown.Value, predator.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-                    else
-                        graphics.FillEllipse(Brushes.Red, predator.x * (int)resolutionUpDown.Value, predator.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-                }
-                else
-                    graphics.FillEllipse(Brushes.Gray, predator.x * (int)resolutionUpDown.Value, predator.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-            }
+                paintOrg(predator.x, predator.y, predator.isAlive, predator.male, Brushes.DarkRed, Brushes.Red, Brushes.DarkGray);
+
 
             // show omnivores
             foreach (var omnivore in omnivores)
-            {
-                if (omnivore.is_alive)
-                {
-                    if (omnivore.male)
-                        graphics.FillEllipse(Brushes.Brown, omnivore.x * (int)resolutionUpDown.Value, omnivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-                    else
-                        graphics.FillEllipse(Brushes.RosyBrown, omnivore.x * (int)resolutionUpDown.Value, omnivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-                }
-                else
-                    graphics.FillEllipse(Brushes.Gray, omnivore.x * (int)resolutionUpDown.Value, omnivore.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-            }
+                paintOrg(omnivore.x, omnivore.y, omnivore.isAlive, omnivore.male, Brushes.DarkViolet, Brushes.Violet, Brushes.Gray);
 
-            refreshInfoAboutObservedOrganism();
+
+            if (observedHerbivore != null)
+                refreshOrgShowingInfo(observedHerbivore.isAlive, observedHerbivore.male, observedHerbivore.wantReproduce, observedHerbivore.wantFood, observedHerbivore.fullness, observedHerbivore.x, observedHerbivore.y, observedHerbivore.orgID, observedHerbivore.organismRange, observedHerbivore.deadUntil, observedHerbivore.deadFor, "Herbivore");
+            else if (observedOmnivore != null)
+                refreshOrgShowingInfo(observedOmnivore.isAlive, observedOmnivore.male, observedOmnivore.wantReproduce, observedOmnivore.wantFood, observedOmnivore.fullness, observedOmnivore.x, observedOmnivore.y, observedOmnivore.orgID, observedOmnivore.organismRange, observedOmnivore.deadUntil, observedOmnivore.deadFor, "Omnivore");
+            else if (observedPredatory != null)
+                refreshOrgShowingInfo(observedPredatory.isAlive, observedPredatory.male, observedPredatory.wantReproduce, observedPredatory.wantFood, observedPredatory.fullness, observedPredatory.x, observedPredatory.y, observedPredatory.orgID, observedPredatory.organismRange, observedPredatory.deadUntil, observedPredatory.deadFor, "Predatory");
+
             refreshInfoAboutDay();
             pictureBox1.Refresh();
         }
