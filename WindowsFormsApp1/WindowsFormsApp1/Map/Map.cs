@@ -19,6 +19,7 @@ namespace WindowsFormsApp1
         public List<Plant> plants = new List<Plant>();
 
         public Meteorite meteorite;
+        private bool meteoriteIsActive = false;
 
         public int rows;
         public int cols;
@@ -33,9 +34,21 @@ namespace WindowsFormsApp1
         public int minOrgRange;
         public int orgRollBackReproduce;
         public int orgDeadBeforeBecomingGrass;
+        public int chanceOfMeteoriteToFallOnMap;
+        public int chanceOfHumanToSpawnOnShard;
+        public int chanceOfPlantToSpawnOnShard;
+        public int howManyTicksFall;
+        public int howManyTicksShards;
+        public int howManyTicksBeforeDissolving;
 
-        public Map(int _herbivores, int _predators, int _plants, int _plantsGrowth, int _rows, int _cols, int _dayNightChange, int _minOrgRange, int _orgRollBackReproduce, int _orgDeadBeforeBecomingGrass)
+        public Map(int _herbivores, int _predators, int _plants, int _plantsGrowth, int _rows, int _cols, int _dayNightChange, int _minOrgRange, int _orgRollBackReproduce, int _orgDeadBeforeBecomingGrass, int _chanceOfMeteoriteToFallOnMap, int _chanceOfHumanToSpawnOnShard, int _chanceOfPlantToSpawnOnShard, int _howManyTicksFall, int _howManyTicksShards, int _howManyTicksBeforeDissolving)
         {
+            howManyTicksFall = _howManyTicksFall;
+            howManyTicksShards = _howManyTicksShards;
+            howManyTicksBeforeDissolving = _howManyTicksBeforeDissolving;
+            chanceOfMeteoriteToFallOnMap = _chanceOfMeteoriteToFallOnMap;
+            chanceOfHumanToSpawnOnShard = _chanceOfHumanToSpawnOnShard;
+            chanceOfPlantToSpawnOnShard = _chanceOfPlantToSpawnOnShard;
             plantsAmount = _plants;
             herbivoresAmount = _herbivores;
             predatorsAmount = _predators;
@@ -82,6 +95,24 @@ namespace WindowsFormsApp1
             }
         }
 
+        public void MeteoriteIsNotActive()
+        {
+            meteoriteIsActive = false;
+        }
+
+
+
+        private void toFallOrNotToFall()
+        {
+            if (random.Next(100) < chanceOfMeteoriteToFallOnMap)
+            {
+                meteorite = new Meteorite(this);
+                meteorite.meteoriteIsComing(howManyTicksFall, howManyTicksShards, howManyTicksBeforeDissolving, random.Next(cols), random.Next(rows));
+                meteorite.FirstTick();
+                meteoriteIsActive = true;
+            }
+        }
+
         public bool PlantWasEaten(int x, int y)
         {
             if(DeleteOnCell<Plant>(x, y))
@@ -90,7 +121,6 @@ namespace WindowsFormsApp1
                 return true;
             }
             return false;
-
         }
 
         public bool HerbivoreWasEaten(int x, int y)
@@ -320,14 +350,16 @@ namespace WindowsFormsApp1
             // set omnivores
             for (int i = 0; i < 0; i++)
                 OmnivoreBabyWasMade(Omnivore.RandSpawn(this));
-            meteorite = new Meteorite(this);
-            meteorite.meteoriteIsComing(15, 15, 20, 50, 50);
-            meteorite.FirstTick();
-
+            toFallOrNotToFall();
             return map;
         }
         public Cell[,] UpdateWorld()
         {
+            if (meteoriteIsActive)
+                meteorite.nextTick();
+            else
+                toFallOrNotToFall();
+
             addPlants();
             for (int i = predators.Count - 1; i >= 0; i--)
                 predators[i].NextMove();
@@ -335,7 +367,7 @@ namespace WindowsFormsApp1
                 omnivores[i].NextMove();
             for (int i = herbivores.Count - 1; i >= 0; i--)
                 herbivores[i].NextMove();
-            meteorite.nextTick();
+
             if (timeToChangeDayOrNight())
                 day = !day;
             return map;

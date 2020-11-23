@@ -9,8 +9,18 @@ namespace WindowsFormsApp1
 {
     public class Runner
     {
+        // organisms
         private const int herbivores = 100;
         private const int predators = 25;
+
+        // meteorite
+        private const int chanceOfMeteoriteToFallOnMap = 1; // out of 100
+        private const int chanceOfHumanToSpawnOnShard = 5; // out of 100
+        private const int chanceOfPlantToSpawnOnShard = 15; // out of 100
+        // chanceOfNothingToSpawnOnShard = 100 - chanceOfHumanToSpawnOnShard - chanceOfPlantToSpawnOnShard
+        private const int howManyTicksFall = 10;
+        private const int howManyTicksShards = 15;
+        private const int howManyTicksBeforeDissolving = 15;
 
         private const int minOrgRange = 25;
         private const int orgRollBackReproduce = 150;
@@ -43,16 +53,16 @@ namespace WindowsFormsApp1
         }
         public void FirstTick()
         {
-            map = new Map(herbivores, predators, plants, plantsGrowth, rows, cols, dayNightChange, minOrgRange, orgRollBackReproduce, orgDeadBeforeBecomingGrass);
+            map = new Map(herbivores, predators, plants, plantsGrowth, rows, cols, dayNightChange, minOrgRange, orgRollBackReproduce, orgDeadBeforeBecomingGrass, chanceOfMeteoriteToFallOnMap, chanceOfHumanToSpawnOnShard, chanceOfPlantToSpawnOnShard, howManyTicksFall, howManyTicksShards, howManyTicksBeforeDissolving);
             form1.InitGraphics();
             map.CreateWorld();
-            form1.DrawCanvas(map.plants, map.herbivores, map.predators, map.omnivores, map.meteorite.meteoriteShards, map.day);
+            form1.DrawCanvas(map.plants, map.herbivores, map.predators, map.omnivores, (map.meteorite != null) ? map.meteorite.meteoriteShards : null, map.day);
             form1.StartTimer();
         }
         public void NextTick()
         {
             map.UpdateWorld();
-            form1.DrawCanvas(map.plants, map.herbivores, map.predators, map.omnivores, map.meteorite.meteoriteShards, map.day);
+            form1.DrawCanvas(map.plants, map.herbivores, map.predators, map.omnivores, (map.meteorite != null) ? map.meteorite.meteoriteShards : null, map.day);
         }
         public Herbivore TryToGetHerbivore(int x, int y)
         {

@@ -52,7 +52,7 @@ namespace WindowsFormsApp1
                 {
                     currShardsMaking++;
 
-                    if (currShardsMaking < howManyTicksBeforeDissolving)
+                    if (currShardsMaking < howManyTicksShards)
                     {
                         makeShards(++currMeteoriteRange, true);
                         killEverything();
@@ -67,7 +67,7 @@ namespace WindowsFormsApp1
                 {
                     currDissolving++;
 
-                    if (currDissolving >= howManyTicksShards)
+                    if (currDissolving >= howManyTicksBeforeDissolving)
                     {
                         dissolved = true;
                         dissolve();
@@ -96,6 +96,7 @@ namespace WindowsFormsApp1
                 map.DeleteOnCell<MeteoriteShard>(meteoriteShards[i].x, meteoriteShards[i].y);
                 meteoriteShards.Remove(meteoriteShards[i]);
             }
+            map.MeteoriteIsNotActive();
         }
         private void killEverything()
         {

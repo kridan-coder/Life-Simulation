@@ -217,19 +217,22 @@ namespace WindowsFormsApp1
                 graphics.Clear(Color.DarkSlateBlue);
 
             // show shards
-            foreach (var shard in shards)
+            if (shards != null)
             {
-                if (!shard.meteorite.hasFallen)
+                foreach (var shard in shards)
                 {
-                    graphics.FillRectangle(Brushes.Black, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-                }
-                else if (shard.meteorite.hasFallen && !shard.meteorite.becameCold)
-                {
-                    graphics.FillRectangle(Brushes.Orange, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
-                }
-                else if (shard.meteorite.becameCold)
-                {
-                    graphics.FillRectangle(Brushes.DarkCyan, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    if (!shard.meteorite.hasFallen)
+                    {
+                        graphics.FillRectangle(Brushes.Black, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    }
+                    else if (shard.meteorite.hasFallen && !shard.meteorite.becameCold)
+                    {
+                        graphics.FillRectangle(Brushes.Orange, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    }
+                    else if (shard.meteorite.becameCold)
+                    {
+                        graphics.FillRectangle(Brushes.DarkCyan, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    }
                 }
             }
 
