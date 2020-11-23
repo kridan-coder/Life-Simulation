@@ -17,6 +17,8 @@ namespace WindowsFormsApp1
         public int howManyTicksShards;
         public int howManyTicksBeforeDissolving;
 
+        public int chanceOfHumanToSpawn, chanceOfPlantToSpawn;
+
         private int currFalling = 0, currShardsMaking = 0, currDissolving = 0;
 
         private int currMeteoriteRange = 0;
@@ -83,12 +85,12 @@ namespace WindowsFormsApp1
                 int randNum = map.random.Next(100);
                 map.DeleteEverythingExceptShard(meteoriteShards[i]);
 
-                if (randNum < 10)
+                if (randNum < chanceOfHumanToSpawn)
                 {
                     Omnivore baby = new Omnivore(meteoriteShards[i].x, meteoriteShards[i].y, false,0,100,100,map);
                     baby.makeBaby();
                 }
-                else if (randNum < 25)
+                else if (randNum < chanceOfHumanToSpawn + chanceOfPlantToSpawn)
                 {
                     Plant plant = new Plant(meteoriteShards[i].x, meteoriteShards[i].y, map);
                     map.PlantWasMade(plant);
@@ -183,8 +185,10 @@ namespace WindowsFormsApp1
             }
         }
 
-        public void meteoriteIsComing(int _howManyTicksFall, int _howManyTicksShards, int _howManyTicksBeforeDissolving, int _midX, int _midY)
+        public void meteoriteIsComing(int _chanceOfHumanToSpawn, int _chanceOfPlantToSpawn, int _howManyTicksFall, int _howManyTicksShards, int _howManyTicksBeforeDissolving, int _midX, int _midY)
         {
+            chanceOfHumanToSpawn = _chanceOfHumanToSpawn;
+            chanceOfPlantToSpawn = _chanceOfPlantToSpawn;
             midX = _midX;
             midY = _midY;
             howManyTicksFall = _howManyTicksFall;

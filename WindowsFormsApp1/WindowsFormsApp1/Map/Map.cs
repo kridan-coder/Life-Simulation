@@ -107,7 +107,7 @@ namespace WindowsFormsApp1
             if (random.Next(100) < chanceOfMeteoriteToFallOnMap)
             {
                 meteorite = new Meteorite(this);
-                meteorite.meteoriteIsComing(howManyTicksFall, howManyTicksShards, howManyTicksBeforeDissolving, random.Next(cols), random.Next(rows));
+                meteorite.meteoriteIsComing(chanceOfHumanToSpawnOnShard,chanceOfPlantToSpawnOnShard, howManyTicksFall, howManyTicksShards, howManyTicksBeforeDissolving, random.Next(cols), random.Next(rows));
                 meteorite.FirstTick();
                 meteoriteIsActive = true;
             }
