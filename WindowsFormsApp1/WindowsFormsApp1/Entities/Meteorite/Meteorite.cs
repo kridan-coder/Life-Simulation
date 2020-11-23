@@ -78,7 +78,7 @@ namespace WindowsFormsApp1
 
         private void dissolve()
         {
-            for (int i = 0; i < meteoriteShards.Count; i++)
+            for (int i = meteoriteShards.Count - 1; i >= 0; i--)
             {
                 int randNum = map.random.Next(100);
                 map.DeleteEverythingExceptShard(meteoriteShards[i]);
@@ -93,6 +93,7 @@ namespace WindowsFormsApp1
                     Plant plant = new Plant(meteoriteShards[i].x, meteoriteShards[i].y, map);
                     map.PlantWasMade(plant);
                 }
+                map.DeleteOnCell<MeteoriteShard>(meteoriteShards[i].x, meteoriteShards[i].y);
                 meteoriteShards.Remove(meteoriteShards[i]);
             }
         }

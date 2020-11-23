@@ -84,7 +84,7 @@ namespace WindowsFormsApp1
 
         public bool PlantWasEaten(int x, int y)
         {
-            if(DeletePlantOnCell(x, y))
+            if(DeleteOnCell<Plant>(x, y))
             {
                 plants.Remove(plants.Find(plant => plant.x == x && plant.y == y));
                 return true;
@@ -189,6 +189,7 @@ namespace WindowsFormsApp1
             // should never come to this line actually
             return null;
         }
+
         public Herbivore GetHerbivoreOnCell(int x, int y)
         {
             for (int i = 0; i < map[x, y].OnCell.Count; i++)
@@ -266,17 +267,27 @@ namespace WindowsFormsApp1
         }
 
 
-
-        public bool DeletePlantOnCell(int x, int y)
+        public bool DeleteOnCell<T>(int x, int y)
         {
             for (int i = 0; i < map[x, y].OnCell.Count; i++)
-                if (map[x, y].OnCell[i] is Plant)
+                if (map[x, y].OnCell[i] is T)
                 {
                     map[x, y].OnCell.Remove(map[x, y].OnCell[i]);
                     return true;
                 }
             return false;
         }
+
+        //public bool DeletePlantOnCell(int x, int y)
+        //{
+        //    for (int i = 0; i < map[x, y].OnCell.Count; i++)
+        //        if (map[x, y].OnCell[i] is Plant)
+        //        {
+        //            map[x, y].OnCell.Remove(map[x, y].OnCell[i]);
+        //            return true;
+        //        }
+        //    return false;
+        //}
         public bool OrganismHasOppositeSex<TFood>(int x, int y, bool sex) where TFood : Edible
         {
             for (int i = 0; i < map[x, y].OnCell.Count; i++)
