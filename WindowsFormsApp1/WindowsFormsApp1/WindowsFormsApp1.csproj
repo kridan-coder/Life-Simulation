@@ -48,19 +48,47 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sentries\MainSentry.cs" />
+    <Compile Include="Sentries\MeteoriteSentry.cs" />
+    <Compile Include="Sentries\DayNightSentry.cs" />
+    <Compile Include="Sentries\OrganismSentry.cs" />
     <Compile Include="Entities\Directions.cs" />
+    <Compile Include="Entities\Organisms\Herbivore\Rabbit.cs" />
+    <Compile Include="Entities\Organisms\Herbivore\Mouse.cs" />
+    <Compile Include="Entities\Organisms\Herbivore\Deer.cs" />
+    <Compile Include="Entities\Organisms\Omnivore\Bear.cs" />
+    <Compile Include="Entities\Organisms\Omnivore\Raccoon.cs" />
+    <Compile Include="Entities\Organisms\Omnivore\Pig.cs" />
+    <Compile Include="Entities\Organisms\Omnivore\Human.cs" />
+    <Compile Include="Entities\Organisms\OrganismWithoutGeneric.cs" />
+    <Compile Include="Entities\Organisms\Predatory\Wolf.cs" />
+    <Compile Include="Entities\Organisms\Predatory\Fox.cs" />
+    <Compile Include="Entities\Organisms\Predatory\Lion.cs" />
+    <Compile Include="RationInterfaces\Edible\Herbivore\EdibleForMouse.cs" />
+    <Compile Include="RationInterfaces\Edible\Herbivore\EdibleForDeer.cs" />
+    <Compile Include="RationInterfaces\Edible\Herbivore\EdibleForRabbit.cs" />
+    <Compile Include="RationInterfaces\Edible\Omnivore\EdibleForHuman.cs" />
+    <Compile Include="RationInterfaces\Edible\Omnivore\EdibleForRaccoon.cs" />
+    <Compile Include="RationInterfaces\Edible\Omnivore\EdibleForPig.cs" />
+    <Compile Include="RationInterfaces\Edible\Omnivore\EdibleForBear.cs" />
+    <Compile Include="RationInterfaces\Edible\Predatory\EdibleForFox.cs" />
+    <Compile Include="RationInterfaces\Edible\Predatory\EdibleForWolf.cs" />
+    <Compile Include="RationInterfaces\Edible\Predatory\EdibleForLion.cs" />
     <Compile Include="Entities\Entity.cs" />
-    <Compile Include="Entities\Edible\Edible.cs" />
-    <Compile Include="Entities\Edible\EdibleForPredatory.cs" />
-    <Compile Include="Entities\Edible\EdibleForHerbivore.cs" />
-    <Compile Include="Entities\Edible\EdibleForOmnivore.cs" />
+    <Compile Include="RationInterfaces\Edible\Edible.cs" />
+    <Compile Include="RationInterfaces\Edible\Predatory\EdibleForPredatory.cs" />
+    <Compile Include="RationInterfaces\Edible\Herbivore\EdibleForHerbivore.cs" />
+    <Compile Include="RationInterfaces\Edible\Omnivore\EdibleForOmnivore.cs" />
     <Compile Include="Entities\Meteorite\MeteoriteShard.cs" />
-    <Compile Include="Entities\Meteorite\Meteorite.cs" />
-    <Compile Include="Entities\Organisms\Herbivore.cs" />
-    <Compile Include="Entities\Organisms\Omnivore.cs" />
+    <Compile Include="Entities\Organisms\Herbivore\Herbivore.cs" />
+    <Compile Include="Entities\Organisms\Omnivore\Omnivore.cs" />
     <Compile Include="Entities\Organisms\Organism.cs" />
-    <Compile Include="Entities\Plant.cs" />
-    <Compile Include="Entities\Organisms\Predatory.cs" />
+    <Compile Include="Entities\Plants\Apple.cs" />
+    <Compile Include="Entities\Plants\Oat.cs" />
+    <Compile Include="Entities\Plants\Carrot.cs" />
+    <Compile Include="Entities\Plants\Plant.cs" />
+    <Compile Include="Entities\Organisms\Predatory\Predatory.cs" />
+    <Compile Include="Sentries\PlantSentry.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

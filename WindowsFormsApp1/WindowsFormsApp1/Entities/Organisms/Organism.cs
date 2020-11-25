@@ -6,44 +6,45 @@ using System.Threading.Tasks;
 using System.Numerics;
 namespace WindowsFormsApp1
 {
-    public abstract class Organism<TFood> : Entity
+    public abstract class Organism<T, TFood> : Organism
+        where T : Organism
         where TFood : Edible
     {
-        private static int lastOrgID;
+        private static OrganismSentry organismSentry;
 
-        public bool isAlive;
+        public bool IsAlive;
 
-        public int orgID;
+        public int OrganismRange;
 
-        public int organismRange;
+        public int DeadUntil;
+        public int NoReproduceUntil;
+        public static int StutterUntil;
 
-        public int deadUntil;
-        public int noReproduceUntil;
+        public bool Male;
 
-        public bool male;
+        public int DeadFor = 0;
+        public int ReproducedFor = 0;
+        public int Fullness = 100;
+        public int StutterFor = 0;
 
-        public int deadFor = 0;
-        public int reproducedFor = 0;
-        public int fullness = 100;
+        public bool WantFood = false;
+        public bool WantReproduce = false;
 
-        public bool wantFood = false;
-        public bool wantReproduce = false;
-
-        public Organism(int _x, int _y, bool _male, int _range, int _rollBack, int _deadUntil, Map _map) : base(_x, _y, _map)
+        public Organism(int _x, int _y, bool _male, int _range, int _rollBack, int _deadUntil, int _stutter, OrganismSentry _organismSentry) : base(_x, _y)
         {
-            orgID = lastOrgID++;
-            male = _male;
-            organismRange = _range;
-            deadUntil = _deadUntil;
-            noReproduceUntil = _rollBack;
-            isAlive = true;
+            organismSentry = _organismSentry;
+            StutterUntil = _stutter;
+            Male = _male;
+            OrganismRange = _range;
+            DeadUntil = _deadUntil;
+            NoReproduceUntil = _rollBack;
+            IsAlive = true;
         }
 
-        // main function called by map
-        public void NextMove()
+        public override void NextMove()
         {
             Direction direction = Direction.None;
-            if (isAlive)
+            if (IsAlive)
             {
                 checkFood();
                 checkReproduce();
@@ -53,119 +54,145 @@ namespace WindowsFormsApp1
             else if (deadLongEnough())
                 becomingPlant();
         }
-        public abstract void becomingPlant();
-        public static (int, int, bool, int, int, int) RandSpawnValues(Map map)
-        {
-            int x, y, orgRange;
-            bool male;
-            while (true)
-            {
-                x = map.random.Next(map.cols);
-                y = map.random.Next(map.rows);
-                if (map.map[x, y].OnCell.Count == 0)
-                {
-                    if (map.random.Next(100) > 50)
-                        male = true;
-                    else
-                        male = false;
-                    orgRange = map.minOrgRange + map.random.Next(map.minOrgRange);
-                    return (x, y, male, orgRange, map.orgRollBackReproduce, map.orgDeadBeforeBecomingGrass);
-                }
-            }
-        }
-
+        
         private void checkFood()
         {
-            if (map.IsOnCell<TFood>(x, y) && wantFood)
+            if (organismSentry.IsOnCell<TFood>((X,Y)) && WantFood)
             {
                 changeValuesOnEating();
                 EatFood();
             }
         }
-
-        public abstract void EatFood();
-
-        private void checkReproduce()
+        private void becomingPlant()
         {
-            if (wantReproduce && map.OrganismHasOppositeSex<TFood>(x, y, male))
+            organismSentry.OrganismBecamePlant(this);
+        }
+
+        public static Organism RandSpawn(OrganismSentry organismSentry)
+        {
+            (int, int) XY;
+            int orgRange;
+            bool Male;
+            while (true)
             {
-                changeValuesOnReproduce();
-                map.FindMyPartner<TFood>(x, y, this.male).changeValuesOnReproduce();
-                makeBaby();
+                XY = organismSentry.GetRandCoordsOnMap();
+                if (organismSentry.CellIsEmpty(XY))
+                {
+                    Male = randomSex();
+                    orgRange = randomVisionRange(organismSentry);
+                    return SetOrganism<T>(XY, orgRange, Male);
+                }
             }
         }
 
-        public abstract void makeBaby();
-        private void makeMove(Direction direction)
+        public static Organism SetOrganism<Type>((int, int) XY, int range, bool Male) 
+            where Type : Organism
         {
-            map.DeleteOrgOnCell(this);
-            changeValuesOnMove();
-            moveOnMap(direction);
-            map.OrganismMadeItsMove(this);
-        }
-        private Direction makeDecision(Direction direction)
-        {
-            if (wantReproduce)
-                direction = chooseDirection(FindOnMap<Organism<TFood>>(true, this.male));
-            else if (wantFood)
-                direction = chooseDirection(FindOnMap<TFood>(false, null));
-            // no idea what to do
-            if (direction == Direction.None)
-                direction = randomDirection8();
-            direction = finalDecision(direction);
-            return direction;
+            return (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Male, range, organismSentry.MaxOrgTicksBeforeReproducing, organismSentry.MaxOrgTicksBeforeBecomingGrass, StutterUntil, organismSentry });
         }
 
-        public abstract Direction finalDecision(Direction direction);
-        public (int, int, bool, int, int, int) MakeBabyValues()
+        public Organism MakeBaby()
         {
             bool babyMale;
             int babyRange;
-            if (map.random.Next(100) > 50)
-                babyMale = true;
-            else
-                babyMale = false;
-            babyRange = map.minOrgRange + map.random.Next(map.minOrgRange);
-            return (x, y, babyMale, babyRange, map.orgRollBackReproduce, map.orgDeadBeforeBecomingGrass);
+            babyMale = randomSex();
+            babyRange = randomVisionRange(organismSentry);
+            return SetOrganism<T>((X,Y), babyRange, babyMale);
+        }
+
+        private static bool randomSex()
+        {
+            return organismSentry.Random.Next(100) > 50;
+        }
+
+        private static int randomVisionRange(OrganismSentry organismSentry)
+        {
+            return organismSentry.MaxOrgVisionRange - organismSentry.Random.Next(organismSentry.MaxOrgVisionRange);
+        }
+
+        public void EatFood()
+        {
+            organismSentry.EntityWasEaten<TFood>((X,Y));
+        }
+
+        private void checkReproduce()
+        {
+            if (WantReproduce)
+            {
+                Organism<T,TFood> potentialPartner = organismSentry.FindOrganismPartner<T,TFood>((X, Y), Male);
+                if (potentialPartner != null)
+                {
+                    changeValuesOnReproduce();
+                    potentialPartner.changeValuesOnReproduce();
+                    MakeBaby();
+                }
+            }
+        }
+
+        private void makeMove(Direction direction)
+        {
+            organismSentry.OrganismWasDestroyedOnMap(this);
+            changeValuesOnMove();
+            move(direction);
+            organismSentry.OrganismWasMadeOnMap(this);
+        }
+        private Direction makeDecision(Direction direction)
+        {
+            if (WantReproduce)
+                direction = chooseDirection(findOnMap(Male));
+            else if (WantFood)
+                direction = chooseDirection(findOnMap(null));
+            // no idea what to do
+            if (direction == Direction.None)
+                direction = RandomDirection8(organismSentry.Random);
+            direction = finalDecision(direction);
+            return direction;
+        }
+        private Direction finalDecision(Direction direction)
+        {
+            if (StutterFor++ >= StutterUntil)
+            {
+                StutterFor = 0;
+                return direction;
+            }
+            return Direction.None;
         }
         private int setActualRange()
         {
-            return (map.day) ? organismRange : organismRange / 2;
+            return (organismSentry.IsItDayToday()) ? OrganismRange : OrganismRange / 2;
         }
-        private bool sellIsAppropriate<T>(int x, int y, bool findingPartner, bool? sex)
+        private bool cellIsAppropriate((int, int) XY, bool? sex)
         {
-            return map.CheckBorders(x, y)
-                && map.IsOnCell<T>(x, y)
-                && ((findingPartner) ? map.OrganismHasOppositeSex<TFood>(x, y, (bool)sex) : true);
+            return organismSentry.CellIsAppropriate<T, TFood>(XY, sex);
         }
-        private (int, int)? checkLines<T>(int range, bool findingPartner, bool? sex)
+        private (int, int)? checkLines(int range, bool? sex)
         {
             // top
-            for (int i = x - range; i < x + range; i++)
-                if (sellIsAppropriate<T>(i, y - range, findingPartner, sex))
-                    return (i, y - range);
+            for (int i = X - range; i < X + range; i++)
+                if (cellIsAppropriate((i, Y - range), sex))
+                    return (i, Y - range);
             // right
-            for (int i = y - range; i < y + range; i++)
-                if (sellIsAppropriate<T>(x + range, i, findingPartner, sex))
-                    return (x + range, i);
+            for (int i = Y - range; i < Y + range; i++)
+                if (cellIsAppropriate((X + range, i), sex))
+                    return (X + range, i);
             // bottom
-            for (int i = x + range; i > x - range; i--)
-                if (sellIsAppropriate<T>(i, y + range, findingPartner, sex))
-                    return (i, y + range);
+            for (int i = X + range; i > X - range; i--)
+                if (cellIsAppropriate((i, Y + range), sex))
+                    return (i, Y + range);
             // left
-            for (int i = y + range; i > y - range; i--)
-                if (sellIsAppropriate<T>(x - range, i, findingPartner, sex))
-                    return (x - range, i);
+            for (int i = Y + range; i > Y - range; i--)
+                if (cellIsAppropriate((X - range, i), sex))
+                    return (X - range, i);
             return null;
 
         }
-        private (int, int)? FindOnMap<T>(bool findingPartner, bool? sex)
+        private (int, int)? findOnMap(bool? sex)
         {
             int currentRange = 1;
             int maxRange = setActualRange();
             (int,int)? found = null;
             while (currentRange <= maxRange && found == null)
-                found = checkLines<T>(currentRange++, findingPartner, sex);
+                found = checkLines(currentRange++, sex);
             return found;
         }
         private Direction chooseDirection((int, int)? goal)
@@ -175,131 +202,133 @@ namespace WindowsFormsApp1
             else
             {
                 (int, int) goalIndeed = ((int, int)) goal;
-                if (x < goalIndeed.Item1)
+                if (X < goalIndeed.Item1)
                 {
-                    if (y > goalIndeed.Item2)
+                    if (Y > goalIndeed.Item2)
                         return Direction.TopRight;
-                    else if (y == goalIndeed.Item2)
+                    else if (Y == goalIndeed.Item2)
                         return Direction.Right;
-                    else if (y < goalIndeed.Item2)
+                    else if (Y < goalIndeed.Item2)
                         return Direction.BottomRight;
                 }
-                else if (x > goalIndeed.Item1)
+                else if (X > goalIndeed.Item1)
                 {
-                    if (y < goalIndeed.Item2)
+                    if (Y < goalIndeed.Item2)
                         return Direction.BottomLeft;
-                    else if (y == goalIndeed.Item2)
+                    else if (Y == goalIndeed.Item2)
                         return Direction.Left;
-                    else if (y > goalIndeed.Item2)
+                    else if (Y > goalIndeed.Item2)
                         return Direction.TopLeft;
                 }
-                else if (x == goalIndeed.Item1)
+                else if (X == goalIndeed.Item1)
                 {
-                    if (y < goalIndeed.Item2)
+                    if (Y < goalIndeed.Item2)
                         return Direction.Bottom;
-                    else if (y > goalIndeed.Item2)
+                    else if (Y > goalIndeed.Item2)
                         return Direction.Top;
                 }
                 return Direction.None;
             }
-
-
-
         }
-        private void moveOnMap(Direction direction)
+        private void move(Direction direction)
         {
             switch (direction)
             {
                 case Direction.TopLeft:
-                    if (map.CheckBorders(x - 1, y))
-                        x--;
-                    else if (map.CheckBorders(x, y - 1))
-                        y--;
+                    if (canStepOnCell((X - 1, Y)))
+                        X--;
+                    else if (canStepOnCell((X, Y - 1)))
+                        Y--;
                     break;
                 case Direction.Top:
-                    if (map.CheckBorders(x, y - 1))
-                        y--;
+                    if (canStepOnCell((X, Y - 1)))
+                        Y--;
                     break;
                 case Direction.TopRight:
-                    if (map.CheckBorders(x + 1, y))
-                        x++;
-                    else if (map.CheckBorders(x, y - 1))
-                        y--;
+                    if (canStepOnCell((X + 1, Y)))
+                        X++;
+                    else if (canStepOnCell((X, Y - 1)))
+                        Y--;
                     break;
                 case Direction.Right:
-                    if (map.CheckBorders(x + 1, y))
-                        x++;
+                    if (canStepOnCell((X + 1, Y)))
+                        X++;
                     break;
                 case Direction.BottomRight:
-                    if (map.CheckBorders(x + 1, y))
-                        x++;
-                    else if (map.CheckBorders(x, y + 1))
-                        y++;
+                    if (canStepOnCell((X + 1, Y)))
+                        X++;
+                    else if (canStepOnCell((X, Y + 1)))
+                        Y++;
                     break;
                 case Direction.Bottom:
-                    if (map.CheckBorders(x, y + 1))
-                        y++;
+                    if (canStepOnCell((X, Y + 1)))
+                        Y++;
                     break;
                 case Direction.BottomLeft:
-                    if (map.CheckBorders(x - 1, y))
-                        x--;
-                    else if (map.CheckBorders(x, y + 1))
-                        y++;
+                    if (canStepOnCell((X - 1, Y)))
+                        X--;
+                    else if (canStepOnCell((X, Y + 1)))
+                        Y++;
                     break;
                 case Direction.Left:
-                    if (map.CheckBorders(x - 1, y))
-                        x--;
+                    if (canStepOnCell((X - 1, Y)))
+                        X--;
                     break;
             }
         }
 
-        // check if alive and increment deadFor counter if needed
+        private bool canStepOnCell((int, int) XY)
+        {
+            return organismSentry.CanStepOnCell(XY);
+        }
+
+        // check if alive and increment DeadFor counter if needed
         private bool deadLongEnough()
         {
-            if (!isAlive && deadFor >= deadUntil)
+            if (!IsAlive && DeadFor >= DeadUntil)
                 return true;
             else
-                deadFor++;
+                DeadFor++;
             return false;
         }
         private void changeValuesOnMove()
         {
-            if (fullness <= 0)
+            if (Fullness <= 0)
             {
-                isAlive = false;
+                IsAlive = false;
             }
-            else if (fullness <= 10 && wantReproduce)
+            else if (Fullness <= 10 && WantReproduce)
             {
-                wantReproduce = false;
-                wantFood = true;
-                fullness--;
+                WantReproduce = false;
+                WantFood = true;
+                Fullness--;
             }
-            else if (fullness < 50 && !wantReproduce)
+            else if (Fullness < 50 && !WantReproduce)
             {
-                wantFood = true;
-                fullness--;
+                WantFood = true;
+                Fullness--;
             }
             else
             {
-                fullness--;
-                if (reproducedFor >= noReproduceUntil)
+                Fullness--;
+                if (ReproducedFor >= NoReproduceUntil)
                 {
-                    wantReproduce = true;
-                    wantFood = false;
+                    WantReproduce = true;
+                    WantFood = false;
                 }
                 else
-                    reproducedFor++;
+                    ReproducedFor++;
             }
         }
         private void changeValuesOnReproduce()
         {
-            reproducedFor = 0;
-            wantReproduce = false;
+            ReproducedFor = 0;
+            WantReproduce = false;
         }
         private void changeValuesOnEating()
         {
-            fullness = 100;
-            wantFood = false;
+            Fullness = 100;
+            WantFood = false;
         }
     }
 }

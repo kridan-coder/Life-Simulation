@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
 {
-    public class Meteorite
+    public class MeteoriteSentry
     {
         public int meteoritePieceID;
         private static int lastMeteoritePieceID;
@@ -29,7 +29,10 @@ namespace WindowsFormsApp1
 
 
         Map map;
-
+        public MeteoriteSentry(Map _map)
+        {
+            map = _map;
+        }
         public void FirstTick()
         {
             MeteoriteShard currShard = new MeteoriteShard(midX, midY, map, this);
@@ -87,7 +90,7 @@ namespace WindowsFormsApp1
 
                 if (randNum < chanceOfHumanToSpawn)
                 {
-                    Omnivore baby = new Omnivore(meteoriteShards[i].x, meteoriteShards[i].y, false,0,100,100,map);
+                    Omnivore baby = new Omnivore(meteoriteShards[i].x, meteoriteShards[i].y, false, 0, 100, 100, map);
                     baby.makeBaby();
                 }
                 else if (randNum < chanceOfHumanToSpawn + chanceOfPlantToSpawn)
@@ -112,7 +115,7 @@ namespace WindowsFormsApp1
             // top
             for (int i = midX - currMeteoriteRange; i < midX + currMeteoriteRange; i++)
             {
-                MeteoriteShard currShard = new MeteoriteShard(0,0,map,this);
+                MeteoriteShard currShard = new MeteoriteShard(0, 0, map, this);
                 currShard = currShard.TryToPlace(i, midY - currMeteoriteRange);
 
                 if (currShard != null)
@@ -199,9 +202,6 @@ namespace WindowsFormsApp1
             hasFallen = false;
         }
 
-        public Meteorite(Map _map)
-        {
-            map = _map;
-        }
+
     }
 }

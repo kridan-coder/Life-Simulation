@@ -9,8 +9,10 @@ namespace WindowsFormsApp1
 {
     public class Map
     {
-        public Random random = new Random();
-        public Cell[,] map;
+        public Random Random = new Random();
+        public Cell[,] Cells;
+
+        
 
         public List<Herbivore> herbivores = new List<Herbivore>();
         public List<Predatory> predators = new List<Predatory>();
@@ -21,8 +23,8 @@ namespace WindowsFormsApp1
         public Meteorite meteorite;
         private bool meteoriteIsActive = false;
 
-        public int rows;
-        public int cols;
+        public int Rows;
+        public int Cols;
         public int herbivoresAmount;
         public int predatorsAmount;
         public int plantsAmount;
@@ -59,10 +61,27 @@ namespace WindowsFormsApp1
             minOrgRange = _minOrgRange;
             orgRollBackReproduce = _orgRollBackReproduce;
             orgDeadBeforeBecomingGrass = _orgDeadBeforeBecomingGrass;
-            map = new Cell[cols, rows];
+            cells = new Cell[cols, rows];
             for (int i = 0; i < cols; i++)
                 for (int j = 0; j < rows; j++)
-                    map[i, j] = new Cell();
+                    cells[i, j] = new Cell();
+        }
+
+
+        public void EntityWasMade(Entity entity)
+        {
+            cells[entity.X, entity.Y].OnCell.Add(entity);
+        }
+
+        public void EntityWasDestroyed(Entity entity)
+        {
+            cells[entity.X, entity.Y].OnCell.Remove(cells[entity.X, entity.Y].OnCell.Find(probablyThisEntity => probablyThisEntity.ID == entity.ID));
+        }
+
+
+        public void OrganismWasMade(Organism organism)
+        {
+            cells[organism.X, organism.Y].OnCell.Add(organism);
         }
 
         // check if day should be changed and increment dayOrNightLastsFor counter if needed
@@ -85,7 +104,7 @@ namespace WindowsFormsApp1
             Plant? potentialPlant;
             for (int i = 0; i < plantsGrowth;)
             {
-                rand_ind = random.Next(plants.Count);
+                rand_ind = Random.Next(plants.Count);
                 potentialPlant = plants[rand_ind].Grow();
                 if (potentialPlant != null)
                 {
@@ -104,10 +123,10 @@ namespace WindowsFormsApp1
 
         private void toFallOrNotToFall()
         {
-            if (random.Next(100) < chanceOfMeteoriteToFallOnMap)
+            if (Random.Next(100) < chanceOfMeteoriteToFallOnMap)
             {
                 meteorite = new Meteorite(this);
-                meteorite.meteoriteIsComing(chanceOfHumanToSpawnOnShard,chanceOfPlantToSpawnOnShard, howManyTicksFall, howManyTicksShards, howManyTicksBeforeDissolving, random.Next(cols), random.Next(rows));
+                meteorite.meteoriteIsComing(chanceOfHumanToSpawnOnShard,chanceOfPlantToSpawnOnShard, howManyTicksFall, howManyTicksShards, howManyTicksBeforeDissolving, Random.Next(cols), Random.Next(rows));
                 meteorite.FirstTick();
                 meteoriteIsActive = true;
             }
@@ -135,29 +154,26 @@ namespace WindowsFormsApp1
         }
 
 
+
         public void HerbivoreBabyWasMade(Herbivore baby)
         {
             herbivores.Add(baby);
-            map[baby.x, baby.y].OnCell.Add(herbivores[herbivores.Count - 1]);
+            cells[baby.x, baby.y].OnCell.Add(herbivores[herbivores.Count - 1]);
         }
         public void PredatorBabyWasMade(Predatory baby)
         {
             predators.Add(baby);
-            map[baby.x, baby.y].OnCell.Add(predators[predators.Count - 1]);
+            cells[baby.x, baby.y].OnCell.Add(predators[predators.Count - 1]);
         }
         public void OmnivoreBabyWasMade(Omnivore baby)
         {
             omnivores.Add(baby);
-            map[baby.x, baby.y].OnCell.Add(omnivores[omnivores.Count - 1]);
+            cells[baby.x, baby.y].OnCell.Add(omnivores[omnivores.Count - 1]);
         }
-        public void PlantWasMade(Plant plant)
-        {
-            plants.Add(plant);
-            map[plant.x, plant.y].OnCell.Add(plants[plants.Count - 1]);
-        }
+
         public void OrganismMadeItsMove<TFood>(Organism<TFood> organism) where TFood : Edible
         {
-            map[organism.x, organism.y].OnCell.Add(organism);
+            cells[organism.x, organism.y].OnCell.Add(organism);
         }
         //public void OrganismBecamePlant<TFood>(Organism<TFood> organism) where TFood : Entity
         //{
@@ -165,7 +181,7 @@ namespace WindowsFormsApp1
         //    if (!IsOnCell<Plant>(organism.x, organism.y))
         //    {
         //        plants.Add(new Plant(organism.x, organism.y, this));
-        //        map[organism.x, organism.y].OnCell.Add(plants[plants.Count - 1]);
+        //        cells[organism.x, organism.y].OnCell.Add(plants[plants.Count - 1]);
         //    }
 
         //    // delete org
@@ -177,7 +193,7 @@ namespace WindowsFormsApp1
             if (!IsOnCell<Plant>(x, y))
             {
                 plants.Add(new Plant(x, y, this));
-                map[x, y].OnCell.Add(plants[plants.Count - 1]);
+                cells[x, y].OnCell.Add(plants[plants.Count - 1]);
             }
         }
         public void PredatorBecamePlant(Predatory organism)
@@ -209,10 +225,10 @@ namespace WindowsFormsApp1
 
         public Organism<TFood> FindMyPartner<TFood>(int x, int y, bool mySex) where TFood : Edible
         {
-            for (int i = 0; i < map[x, y].OnCell.Count; i++)
-                if (map[x, y].OnCell[i] is Organism<TFood>)
+            for (int i = 0; i < cells[x, y].OnCell.Count; i++)
+                if (cells[x, y].OnCell[i] is Organism<TFood>)
                 {
-                    Organism<TFood> potentialPartner = (Organism<TFood>)map[x, y].OnCell[i];
+                    Organism<TFood> potentialPartner = (Organism<TFood>)cells[x, y].OnCell[i];
                     if (potentialPartner.isAlive && potentialPartner.male != mySex && potentialPartner.wantReproduce)
                         return potentialPartner;
                 }
@@ -222,54 +238,54 @@ namespace WindowsFormsApp1
 
         public Herbivore GetHerbivoreOnCell(int x, int y)
         {
-            for (int i = 0; i < map[x, y].OnCell.Count; i++)
-                if (map[x, y].OnCell[i] is Herbivore)
-                    return (Herbivore)map[x, y].OnCell[i];
+            for (int i = 0; i < cells[x, y].OnCell.Count; i++)
+                if (cells[x, y].OnCell[i] is Herbivore)
+                    return (Herbivore)cells[x, y].OnCell[i];
             return null;
         }
         public Omnivore GetOmnivoreOnCell(int x, int y)
         {
-            for (int i = 0; i < map[x, y].OnCell.Count; i++)
-                if (map[x, y].OnCell[i] is Omnivore)
-                    return (Omnivore)map[x, y].OnCell[i];
+            for (int i = 0; i < cells[x, y].OnCell.Count; i++)
+                if (cells[x, y].OnCell[i] is Omnivore)
+                    return (Omnivore)cells[x, y].OnCell[i];
             return null;
         }
         public Predatory GetPredatoryOnCell(int x, int y)
         {
-            for (int i = 0; i < map[x, y].OnCell.Count; i++)
-                if (map[x, y].OnCell[i] is Predatory)
-                    return (Predatory)map[x, y].OnCell[i];
+            for (int i = 0; i < cells[x, y].OnCell.Count; i++)
+                if (cells[x, y].OnCell[i] is Predatory)
+                    return (Predatory)cells[x, y].OnCell[i];
             return null;
         }
 
         public void PlaceMeteoriteShard(MeteoriteShard shard)
         {
             meteorite.meteoriteShards.Add(shard);
-            map[shard.x, shard.y].OnCell.Add(meteorite.meteoriteShards[meteorite.meteoriteShards.Count - 1]);
+            cells[shard.x, shard.y].OnCell.Add(meteorite.meteoriteShards[meteorite.meteoriteShards.Count - 1]);
 
         }
         public void DeleteEverythingExceptShard(MeteoriteShard shard)
         {
-            for (int i = 0; i < map[shard.x, shard.y].OnCell.Count; i++)
-                if (!(map[shard.x, shard.y].OnCell[i] is MeteoriteShard))
+            for (int i = 0; i < cells[shard.x, shard.y].OnCell.Count; i++)
+                if (!(cells[shard.x, shard.y].OnCell[i] is MeteoriteShard))
                 {
-                    if (map[shard.x, shard.y].OnCell[i] is Plant)
+                    if (cells[shard.x, shard.y].OnCell[i] is Plant)
                     {
                         plants.Remove(plants.Find(plant => plant.x == shard.x && plant.y == shard.y));
                     }
-                    if (map[shard.x, shard.y].OnCell[i] is Herbivore)
+                    if (cells[shard.x, shard.y].OnCell[i] is Herbivore)
                     {
                         herbivores.Remove(herbivores.Find(herbivore => herbivore.x == shard.x && herbivore.y == shard.y));
                     }
-                    if (map[shard.x, shard.y].OnCell[i] is Omnivore)
+                    if (cells[shard.x, shard.y].OnCell[i] is Omnivore)
                     {
                         omnivores.Remove(omnivores.Find(omnivore => omnivore.x == shard.x && omnivore.y == shard.y));
                     }
-                    if (map[shard.x, shard.y].OnCell[i] is Predatory)
+                    if (cells[shard.x, shard.y].OnCell[i] is Predatory)
                     {
                         predators.Remove(predators.Find(predator => predator.x == shard.x && predator.y == shard.y));
                     }
-                    map[shard.x, shard.y].OnCell.Remove(map[shard.x, shard.y].OnCell[i]);
+                    cells[shard.x, shard.y].OnCell.Remove(cells[shard.x, shard.y].OnCell[i]);
                 }
 
         }
@@ -281,14 +297,14 @@ namespace WindowsFormsApp1
         }
         public bool DeleteOrgOnCell<TFood>(Organism<TFood> me) where TFood : Edible
         {
-            for (int i = 0; i < map[me.x, me.y].OnCell.Count; i++)
+            for (int i = 0; i < cells[me.x, me.y].OnCell.Count; i++)
             {
-                if (map[me.x, me.y].OnCell[i] is Organism<TFood>)
+                if (cells[me.x, me.y].OnCell[i] is Organism<TFood>)
                 {
-                    Organism<TFood> isItMe = (Organism<TFood>)map[me.x, me.y].OnCell[i];
+                    Organism<TFood> isItMe = (Organism<TFood>)cells[me.x, me.y].OnCell[i];
                     if (isItMe.orgID == me.orgID)
                     {
-                        map[me.x, me.y].OnCell.Remove(map[me.x, me.y].OnCell[i]);
+                        cells[me.x, me.y].OnCell.Remove(cells[me.x, me.y].OnCell[i]);
                         return true;
                     }
                 }
@@ -299,10 +315,10 @@ namespace WindowsFormsApp1
 
         public bool DeleteOnCell<T>(int x, int y)
         {
-            for (int i = 0; i < map[x, y].OnCell.Count; i++)
-                if (map[x, y].OnCell[i] is T)
+            for (int i = 0; i < cells[x, y].OnCell.Count; i++)
+                if (cells[x, y].OnCell[i] is T)
                 {
-                    map[x, y].OnCell.Remove(map[x, y].OnCell[i]);
+                    cells[x, y].OnCell.Remove(cells[x, y].OnCell[i]);
                     return true;
                 }
             return false;
@@ -310,20 +326,20 @@ namespace WindowsFormsApp1
 
         //public bool DeletePlantOnCell(int x, int y)
         //{
-        //    for (int i = 0; i < map[x, y].OnCell.Count; i++)
-        //        if (map[x, y].OnCell[i] is Plant)
+        //    for (int i = 0; i < cells[x, y].OnCell.Count; i++)
+        //        if (cells[x, y].OnCell[i] is Plant)
         //        {
-        //            map[x, y].OnCell.Remove(map[x, y].OnCell[i]);
+        //            cells[x, y].OnCell.Remove(cells[x, y].OnCell[i]);
         //            return true;
         //        }
         //    return false;
         //}
         public bool OrganismHasOppositeSex<TFood>(int x, int y, bool sex) where TFood : Edible
         {
-            for (int i = 0; i < map[x, y].OnCell.Count; i++)
-                if (map[x, y].OnCell[i] is Organism<TFood>)
+            for (int i = 0; i < cells[x, y].OnCell.Count; i++)
+                if (cells[x, y].OnCell[i] is Organism<TFood>)
                 {
-                    Organism<TFood> potentialPartner = (Organism<TFood>)map[x, y].OnCell[i];
+                    Organism<TFood> potentialPartner = (Organism<TFood>)cells[x, y].OnCell[i];
                     if (potentialPartner.male != sex && potentialPartner.isAlive && potentialPartner.wantReproduce)
                         return true; 
                 }
@@ -331,16 +347,17 @@ namespace WindowsFormsApp1
         }
         public bool IsOnCell<T>(int x, int y)
         {
-            for (int i = 0; i < map[x, y].OnCell.Count; i++)
-                if (map[x, y].OnCell[i] is T)
+            for (int i = 0; i < cells[x, y].OnCell.Count; i++)
+                if (cells[x, y].OnCell[i] is T)
                     return true;
             return false;
         }
         public Cell[,] CreateWorld()
         {
+
             // set plants
             for (int i = 0; i < plantsAmount; i++)
-                PlantWasMade(Plant.RandSpawn(this));
+                PlantWasMade(Plant.RandSpawn());
             // set herbivores
             for (int i = 0; i < herbivoresAmount; i++)
                 HerbivoreBabyWasMade(Herbivore.RandSpawn(this));
@@ -351,7 +368,7 @@ namespace WindowsFormsApp1
             for (int i = 0; i < 0; i++)
                 OmnivoreBabyWasMade(Omnivore.RandSpawn(this));
             toFallOrNotToFall();
-            return map;
+            return cells;
         }
         public Cell[,] UpdateWorld()
         {
@@ -370,7 +387,7 @@ namespace WindowsFormsApp1
 
             if (timeToChangeDayOrNight())
                 day = !day;
-            return map;
+            return cells;
         }
     }
 }

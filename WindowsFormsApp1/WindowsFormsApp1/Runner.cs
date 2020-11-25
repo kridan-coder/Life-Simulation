@@ -10,24 +10,24 @@ namespace WindowsFormsApp1
     public class Runner
     {
         // organisms
-        private const int herbivores = 100;
-        private const int predators = 25;
+        private const int herbivores = 30;
+        private const int predators = 30;
 
         // meteorite
-        private const int chanceOfMeteoriteToFallOnMap = 1; // out of 100
-        private const int chanceOfHumanToSpawnOnShard = 5; // out of 100
-        private const int chanceOfPlantToSpawnOnShard = 15; // out of 100
+        private const int chanceOfMeteoriteToFallOnMap = 100; // out of 100
+        private const int chanceOfHumanToSpawnOnShard = 1; // out of 100
+        private const int chanceOfPlantToSpawnOnShard = 0; // out of 100
         // chanceOfNothingToSpawnOnShard = 100 - chanceOfHumanToSpawnOnShard - chanceOfPlantToSpawnOnShard
-        private const int howManyTicksFall = 10;
-        private const int howManyTicksShards = 15;
+        private const int howManyTicksFall = 5;
+        private const int howManyTicksShards = 2;
         private const int howManyTicksBeforeDissolving = 15;
 
         private const int minOrgRange = 25;
         private const int orgRollBackReproduce = 150;
         private const int orgDeadBeforeBecomingGrass = 100;
 
-        private const int plants = 350;
-        private const int plantsGrowth = 10;
+        private const int plants = 100;
+        private const int plantsGrowth = 0;
 
         private const int rows = 100;
         private const int cols = 100;
