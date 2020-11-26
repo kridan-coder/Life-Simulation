@@ -13,9 +13,10 @@ namespace WindowsFormsApp1
         public DayNightSentry dayNightSentry;
         public MeteoriteSentry meteoriteSentry;
 
-        private int chanceOfMeteoriteToFallOnMap,
-            chanceOfHumanToSpawnOnShard,
-            chanceOfPlantToSpawnOnShard;
+        private int maxAmountOfMeteoritesFallingSimultaneously;
+        private int chanceOfMeteoriteToFallOnMap;
+        private int chanceOfHumanToSpawnOnShard;
+        private int chanceOfPlantToSpawnOnShard;
 
         public Random Random;
         public Map Map;
@@ -38,7 +39,7 @@ namespace WindowsFormsApp1
             int maxOrgTicksBeforeReproducing,
             int maxOrgTicksBeforeBecomingGrass,
             int dayNightChange,
-            int amountOfMeteoritesFallingSimultaneously,
+            int maxAmountOfMeteoritesFallingSimultaneously,
             int maxTicksMeteoriteFalling,
             int maxTicksMeteoriteCracking,
             int maxTicksMeteoriteBeforeDissolving,
@@ -50,21 +51,29 @@ namespace WindowsFormsApp1
             Random = map.Random;
             Map = map;
             plantSentry = new PlantSentry(apples, applesGrowth, carrots, carrotsGrowth, oats, oatsGrowth, this);
+            organismSentry = new OrganismSentry(humans, ticksHumanStutter, deers, ticksDeerStutter, mice, ticksMouseStutter, rabbits, ticksRabbitStutter, bears, ticksBearStutter, pigs, ticksPigStutter, raccoons, ticksRaccoonStutter, foxes, ticksFoxStutter, lions, ticksLionStutter, wolves, ticksWolfStutter, maxOrgVisionRange, maxOrgTicksBeforeReproducing, maxOrgTicksBeforeBecomingGrass, this);
+            dayNightSentry = new DayNightSentry(dayNightChange, this);
+            meteoriteSentry = new MeteoriteSentry(this);
+            this.maxAmountOfMeteoritesFallingSimultaneously = maxAmountOfMeteoritesFallingSimultaneously;
+            this.chanceOfMeteoriteToFallOnMap = chanceOfMeteoriteToFallOnMap;
+            this.chanceOfHumanToSpawnOnShard = chanceOfHumanToSpawnOnShard;
+            this.chanceOfPlantToSpawnOnShard = chanceOfPlantToSpawnOnShard;
         }
 
-
-        public void EntityWasEaten<TFood>((int, int) XY)
-    where TFood : Edible
+        public void FirstTick()
         {
-            for (int i = 0; i < Map.Cells[XY.Item1, XY.Item2].OnCell.Count; i++)
-                if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is TFood)
-                {
-                    if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is Plant)
-                        plantSentry.DeletePlant((Plant)Map.Cells[XY.Item1, XY.Item2].OnCell[i]);
-                    else
-                        organismSentry.DeleteOrganism((Organism)Map.Cells[XY.Item1, XY.Item2].OnCell[i]);
-                }
+            plantSentry.FirstTick();
+            organismSentry.FirstTick();
         }
+
+        public void NextTick()
+        {
+            if (MeteoriteSentry.AmountOfActiveMeteorites < maxAmountOfMeteoritesFallingSimultaneously && Random.Next(100) < chanceOfMeteoriteToFallOnMap)
+            {
+
+            }
+        }
+
 
         public (int, int) GetRandCoordsOnMap()
         {
@@ -123,6 +132,19 @@ namespace WindowsFormsApp1
         }
 
         // conversation between sentries
+
+        public void EntityWasEaten<TFood>((int, int) XY)
+    where TFood : Edible
+        {
+            for (int i = 0; i < Map.Cells[XY.Item1, XY.Item2].OnCell.Count; i++)
+                if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is TFood)
+                {
+                    if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is Plant)
+                        plantSentry.DeletePlant((Plant)Map.Cells[XY.Item1, XY.Item2].OnCell[i]);
+                    else
+                        organismSentry.DeleteOrganism((Organism)Map.Cells[XY.Item1, XY.Item2].OnCell[i]);
+                }
+        }
 
         public void OrganismBecamePlant(Organism organism)
         {

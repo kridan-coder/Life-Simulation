@@ -43,7 +43,7 @@ namespace WindowsFormsApp1
             mainSentry.EntityWasDestroyedOnCell(shard);
             MeteoriteShards.Remove(MeteoriteShards.Find(probablyThisShard => probablyThisShard.ID == shard.ID));
         }
-        public void FirstTick()
+        private void firstTick()
         {
             MeteoriteShard firstShard = new MeteoriteShard(midX, midY, this);
             CreateShard(firstShard);
@@ -98,6 +98,14 @@ namespace WindowsFormsApp1
                 shardDissolve(MeteoriteShards[i]);
             }
             AmountOfActiveMeteorites--;
+        }
+
+        private void killEverything()
+        {
+            for (int i = MeteoriteShards.Count - 1; i >= 0; i--)
+            {
+                mainSentry.ShardKilledEverything((MeteoriteShards[i].X, MeteoriteShards[i].Y));
+            }
         }
 
         private void shardDissolve(MeteoriteShard shard)
@@ -200,6 +208,7 @@ namespace WindowsFormsApp1
             Dissolved = false;
             BecameCold = false;
             HasFallen = false;
+            firstTick();
         }
 
         public bool CanPlaceShardOnCell((int, int) XY)

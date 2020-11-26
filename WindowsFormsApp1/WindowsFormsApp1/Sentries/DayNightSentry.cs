@@ -8,6 +8,29 @@ namespace WindowsFormsApp1
 {
     public class DayNightSentry
     {
-        public bool Day;
+        public bool Day = true;
+        public int DayOrNightLastsFor = 0;
+        public int UntilDayOrNight;
+
+        MainSentry mainSentry;
+        public void NextTick()
+        {
+            if (DayOrNightLastsFor >= UntilDayOrNight)
+            {
+                DayOrNightLastsFor = 0;
+                Day = !Day;
+            }
+            else
+            {
+                DayOrNightLastsFor++;
+            }
+        }
+
+        public DayNightSentry(int untilDayOrNight, MainSentry mainSentry)
+        {
+            UntilDayOrNight = untilDayOrNight;
+            this.mainSentry = mainSentry;
+        }
+
     }
 }
