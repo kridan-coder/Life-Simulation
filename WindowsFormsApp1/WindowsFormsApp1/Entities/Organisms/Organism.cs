@@ -91,13 +91,13 @@ namespace WindowsFormsApp1
             return (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Male, range, organismSentry.MaxOrgTicksBeforeReproducing, organismSentry.MaxOrgTicksBeforeBecomingGrass, StutterUntil, organismSentry });
         }
 
-        public Organism MakeBaby()
+        public static Organism MakeBaby((int, int)XY)
         {
             bool babyMale;
             int babyRange;
             babyMale = randomSex();
             babyRange = randomVisionRange(organismSentry);
-            return SetOrganism<T>((X,Y), babyRange, babyMale);
+            return SetOrganism<T>(XY, babyRange, babyMale);
         }
 
         private static bool randomSex()
@@ -124,17 +124,17 @@ namespace WindowsFormsApp1
                 {
                     changeValuesOnReproduce();
                     potentialPartner.changeValuesOnReproduce();
-                    MakeBaby();
+                    MakeBaby((X,Y));
                 }
             }
         }
 
         private void makeMove(Direction direction)
         {
-            organismSentry.OrganismWasDestroyedOnMap(this);
-            changeValuesOnMove();
+            organismSentry.OrganismWasDestroyedOnCell(this);
             move(direction);
-            organismSentry.OrganismWasMadeOnMap(this);
+            changeValuesOnMove();
+            organismSentry.OrganismWasMadeOnCell(this);
         }
         private Direction makeDecision(Direction direction)
         {

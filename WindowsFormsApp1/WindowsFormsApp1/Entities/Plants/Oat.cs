@@ -8,13 +8,8 @@ namespace WindowsFormsApp1
 {
     public class Oat : Plant
     {
-        public Oat(int _x, int _y, Random _random) : base(_x, _y, _random)
+        public Oat(int _x, int _y, PlantSentry plantSentry) : base(_x, _y, plantSentry)
         {
-        }
-
-        public override Plant SetPlant(int x, int y)
-        {
-            return new Oat(x, y, random);
         }
     }
 }

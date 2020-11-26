@@ -112,11 +112,11 @@ namespace WindowsFormsApp1
         public void CreatePlant(Plant plant)
         {
             Plants.Add(plant);
-            mainSentry.EntityWasMadeOnMap(plant);
+            mainSentry.EntityWasMadeOnCell(plant);
         }
         public void DeletePlant(Plant plant)
         {
-            mainSentry.EntityWasDestroyedOnMap(plant);
+            mainSentry.EntityWasDestroyedOnCell(plant);
             Plants.Remove(Plants.Find(probablyThisPlant => probablyThisPlant.ID == plant.ID));
         }
 

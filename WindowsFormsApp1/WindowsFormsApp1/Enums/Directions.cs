@@ -22,7 +22,5 @@ namespace WindowsFormsApp1
         TopRight,
         BottomRight,
         BottomLeft
-
-
     }
 }

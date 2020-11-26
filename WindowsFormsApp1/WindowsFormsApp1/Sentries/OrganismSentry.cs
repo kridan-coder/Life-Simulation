@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WindowsFormsApp1.Entities.Organisms.Predatory;
+
 
 namespace WindowsFormsApp1
 {
@@ -127,7 +127,7 @@ namespace WindowsFormsApp1
         }
 
         private void setOrganismRandomly<T>()
-            where T : Organism, new()
+            where T : Organism
         {
             CreateOrganism(Organism<T, Edible>.RandSpawn(this));
         }
@@ -181,25 +181,25 @@ namespace WindowsFormsApp1
             return mainSentry.FindOrganismPartnerOnCell<T, TFood>(XY, male);
         }
 
-        public void OrganismWasDestroyedOnMap(Organism organism)
+        public void OrganismWasDestroyedOnCell(Organism organism)
         {
-            mainSentry.EntityWasDestroyedOnMap(organism);
+            mainSentry.EntityWasDestroyedOnCell(organism);
         }
 
-        public void OrganismWasMadeOnMap(Organism organism)
+        public void OrganismWasMadeOnCell(Organism organism)
         {
-            mainSentry.EntityWasMadeOnMap(organism);
+            mainSentry.EntityWasMadeOnCell(organism);
         }
 
         public void CreateOrganism(Organism organism)
         {
             Organisms.Add(organism);
-            mainSentry.EntityWasMadeOnMap(organism);
+            mainSentry.EntityWasMadeOnCell(organism);
         }
 
         public void DeleteOrganism(Organism organism)
         {
-            mainSentry.EntityWasDestroyedOnMap(organism);
+            mainSentry.EntityWasDestroyedOnCell(organism);
             Organisms.Remove(Organisms.Find(probablyThisOrganism => probablyThisOrganism.ID == organism.ID));
         }
 
@@ -213,6 +213,12 @@ namespace WindowsFormsApp1
             where TFood : Edible
         {
             mainSentry.EntityWasEaten<TFood>(XY);
+        }
+
+        public void SetOrganismOnCurrentCell<T>((int, int) XY)
+    where T : Organism
+        {
+            CreateOrganism(Organism<T, Edible>.MakeBaby(XY));
         }
     }
 }

@@ -8,73 +8,83 @@ namespace WindowsFormsApp1
 {
     public class MeteoriteSentry
     {
-        public int meteoritePieceID;
-        private static int lastMeteoritePieceID;
+        public static int AmountOfActiveMeteorites;
 
         public int midX, midY;
 
-        public int howManyTicksFall;
-        public int howManyTicksShards;
-        public int howManyTicksBeforeDissolving;
-
-        public int chanceOfHumanToSpawn, chanceOfPlantToSpawn;
+        public int HowManyTicksFall;
+        public int HowManyTicksShards;
+        public int HowManyTicksBeforeDissolving;
 
         private int currFalling = 0, currShardsMaking = 0, currDissolving = 0;
 
         private int currMeteoriteRange = 0;
-        public bool hasFallen;
-        public bool becameCold;
-        public bool dissolved;
-        public List<MeteoriteShard> meteoriteShards = new List<MeteoriteShard>();
+
+        public bool HasFallen;
+        public bool BecameCold;
+        public bool Dissolved;
+        public List<MeteoriteShard> MeteoriteShards = new List<MeteoriteShard>();
 
 
-        Map map;
-        public MeteoriteSentry(Map _map)
+        MainSentry mainSentry;
+        public MeteoriteSentry(MainSentry mainSentry)
         {
-            map = _map;
+            this.mainSentry = mainSentry;
+        }
+
+        public void CreateShard(MeteoriteShard shard)
+        {
+            MeteoriteShards.Add(shard);
+            mainSentry.EntityWasMadeOnCell(shard);
+        }
+
+        public void DeleteShard(MeteoriteShard shard)
+        {
+            mainSentry.EntityWasDestroyedOnCell(shard);
+            MeteoriteShards.Remove(MeteoriteShards.Find(probablyThisShard => probablyThisShard.ID == shard.ID));
         }
         public void FirstTick()
         {
-            MeteoriteShard currShard = new MeteoriteShard(midX, midY, map, this);
-            map.PlaceMeteoriteShard(currShard);
+            MeteoriteShard firstShard = new MeteoriteShard(midX, midY, this);
+            CreateShard(firstShard);
         }
         public void nextTick()
         {
-            if (!dissolved)
+            if (!Dissolved)
             {
-                if (currFalling < howManyTicksFall)
+                if (currFalling < HowManyTicksFall)
                 {
                     currFalling++;
                     makeShards(++currMeteoriteRange, false);
                 }
-                else if (!hasFallen)
+                else if (!HasFallen)
                 {
-                    hasFallen = true;
+                    HasFallen = true;
                     killEverything();
                 }
 
-                if (hasFallen)
+                if (HasFallen)
                 {
                     currShardsMaking++;
 
-                    if (currShardsMaking < howManyTicksShards)
+                    if (currShardsMaking < HowManyTicksShards)
                     {
                         makeShards(++currMeteoriteRange, true);
                         killEverything();
                     }
                     else
                     {
-                        becameCold = true;
+                        BecameCold = true;
                     }
                 }
 
-                if (becameCold)
+                if (BecameCold)
                 {
                     currDissolving++;
 
-                    if (currDissolving >= howManyTicksBeforeDissolving)
+                    if (currDissolving >= HowManyTicksBeforeDissolving)
                     {
-                        dissolved = true;
+                        Dissolved = true;
                         dissolve();
                     }
                 }
@@ -83,125 +93,118 @@ namespace WindowsFormsApp1
 
         private void dissolve()
         {
-            for (int i = meteoriteShards.Count - 1; i >= 0; i--)
+            for (int i = MeteoriteShards.Count - 1; i >= 0; i--)
             {
-                int randNum = map.random.Next(100);
-                map.DeleteEverythingExceptShard(meteoriteShards[i]);
-
-                if (randNum < chanceOfHumanToSpawn)
-                {
-                    Omnivore baby = new Omnivore(meteoriteShards[i].x, meteoriteShards[i].y, false, 0, 100, 100, map);
-                    baby.makeBaby();
-                }
-                else if (randNum < chanceOfHumanToSpawn + chanceOfPlantToSpawn)
-                {
-                    Plant plant = new Plant(meteoriteShards[i].x, meteoriteShards[i].y, map);
-                    map.PlantWasMade(plant);
-                }
-                map.DeleteOnCell<MeteoriteShard>(meteoriteShards[i].x, meteoriteShards[i].y);
-                meteoriteShards.Remove(meteoriteShards[i]);
+                shardDissolve(MeteoriteShards[i]);
             }
-            map.MeteoriteIsNotActive();
-        }
-        private void killEverything()
-        {
-            for (int i = 0; i < meteoriteShards.Count; i++)
-                map.DeleteEverythingExceptShard(meteoriteShards[i]);
+            AmountOfActiveMeteorites--;
         }
 
+        private void shardDissolve(MeteoriteShard shard)
+        {
+            int randNum = mainSentry.Random.Next(100);
+            mainSentry.ShardKilledEverything((shard.X, shard.Y));
+            mainSentry.ShardBecameSomething((shard.X, shard.Y));
+            DeleteShard(shard);
+        }
+
+        public bool canLieOnCell((int, int) XY)
+        {
+            return (mainSentry.CheckBorders(XY) && !mainSentry.IsOnCell<MeteoriteShard>(XY));
+        }
 
         private void makeShards(int currMeteoriteRange, bool flyOff)
         {
             // top
             for (int i = midX - currMeteoriteRange; i < midX + currMeteoriteRange; i++)
             {
-                MeteoriteShard currShard = new MeteoriteShard(0, 0, map, this);
-                currShard = currShard.TryToPlace(i, midY - currMeteoriteRange);
-
-                if (currShard != null)
+                if (canLieOnCell((i, midY - currMeteoriteRange)))
+                {
                     if (flyOff)
                     {
-                        if (map.random.Next(100) < 15)
+                        if (mainSentry.Random.Next(100) < 15)
                         {
-                            map.PlaceMeteoriteShard(currShard);
+                            CreateShard(new MeteoriteShard(i, midY - currMeteoriteRange, this));
                         }
                     }
                     else
                     {
-                        map.PlaceMeteoriteShard(currShard);
+                        CreateShard(new MeteoriteShard(i, midY - currMeteoriteRange, this));
                     }
-
+                }
             }
             // right
             for (int i = midY - currMeteoriteRange; i < midY + currMeteoriteRange; i++)
             {
-                MeteoriteShard currShard = new MeteoriteShard(0, 0, map, this);
-                currShard = currShard.TryToPlace(midX + currMeteoriteRange, i);
-                if (currShard != null)
+                if (canLieOnCell((midX + currMeteoriteRange, i)))
+                {
                     if (flyOff)
                     {
-                        if (map.random.Next(100) < 25)
+                        if (mainSentry.Random.Next(100) < 15)
                         {
-                            map.PlaceMeteoriteShard(currShard);
+                            CreateShard(new MeteoriteShard(midX + currMeteoriteRange, i, this));
                         }
                     }
                     else
                     {
-                        map.PlaceMeteoriteShard(currShard);
+                        CreateShard(new MeteoriteShard(midX + currMeteoriteRange, i, this));
                     }
+                }
             }
             // bottom
             for (int i = midX + currMeteoriteRange; i > midX - currMeteoriteRange; i--)
             {
-                MeteoriteShard currShard = new MeteoriteShard(0, 0, map, this);
-                currShard = currShard.TryToPlace(i, midY + currMeteoriteRange);
-                if (currShard != null)
+                if (canLieOnCell((i, midY + currMeteoriteRange)))
+                {
                     if (flyOff)
                     {
-                        if (map.random.Next(100) < 25)
+                        if (mainSentry.Random.Next(100) < 15)
                         {
-                            map.PlaceMeteoriteShard(currShard);
+                            CreateShard(new MeteoriteShard(i, midY + currMeteoriteRange, this));
                         }
                     }
                     else
                     {
-                        map.PlaceMeteoriteShard(currShard);
+                        CreateShard(new MeteoriteShard(i, midY + currMeteoriteRange, this));
                     }
+                }
             }
             // left
             for (int i = midY + currMeteoriteRange; i > midY - currMeteoriteRange; i--)
             {
-                MeteoriteShard currShard = new MeteoriteShard(0, 0, map, this);
-                currShard = currShard.TryToPlace(midX - currMeteoriteRange, i);
-                if (currShard != null)
+                if (canLieOnCell((midX - currMeteoriteRange, i)))
+                {
                     if (flyOff)
                     {
-                        if (map.random.Next(100) < 25)
+                        if (mainSentry.Random.Next(100) < 15)
                         {
-                            map.PlaceMeteoriteShard(currShard);
+                            CreateShard(new MeteoriteShard(midX - currMeteoriteRange, i, this));
                         }
                     }
                     else
                     {
-                        map.PlaceMeteoriteShard(currShard);
+                        CreateShard(new MeteoriteShard(midX - currMeteoriteRange, i, this));
                     }
+                }
             }
         }
 
-        public void meteoriteIsComing(int _chanceOfHumanToSpawn, int _chanceOfPlantToSpawn, int _howManyTicksFall, int _howManyTicksShards, int _howManyTicksBeforeDissolving, int _midX, int _midY)
+        public void MeteoriteSummon(int _howManyTicksFall, int _howManyTicksShards, int _howManyTicksBeforeDissolving, int _midX, int _midY)
         {
-            chanceOfHumanToSpawn = _chanceOfHumanToSpawn;
-            chanceOfPlantToSpawn = _chanceOfPlantToSpawn;
+            AmountOfActiveMeteorites++;
             midX = _midX;
             midY = _midY;
-            howManyTicksFall = _howManyTicksFall;
-            howManyTicksShards = _howManyTicksShards;
-            howManyTicksBeforeDissolving = _howManyTicksBeforeDissolving;
-            dissolved = false;
-            becameCold = false;
-            hasFallen = false;
+            HowManyTicksFall = _howManyTicksFall;
+            HowManyTicksShards = _howManyTicksShards;
+            HowManyTicksBeforeDissolving = _howManyTicksBeforeDissolving;
+            Dissolved = false;
+            BecameCold = false;
+            HasFallen = false;
         }
 
-
+        public bool CanPlaceShardOnCell((int, int) XY)
+        {
+            return mainSentry.CheckBorders(XY) && !mainSentry.IsOnCell<MeteoriteShard>(XY);
+        }
     }
 }

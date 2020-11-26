@@ -8,10 +8,14 @@ namespace WindowsFormsApp1
 {
     public class MainSentry
     {
-        private PlantSentry plantSentry;
-        private OrganismSentry organismSentry;
-        private DayNightSentry dayNightSentry;
-        private MeteoriteSentry meteoriteSentry;
+        public PlantSentry plantSentry;
+        public OrganismSentry organismSentry;
+        public DayNightSentry dayNightSentry;
+        public MeteoriteSentry meteoriteSentry;
+
+        private int chanceOfMeteoriteToFallOnMap,
+            chanceOfHumanToSpawnOnShard,
+            chanceOfPlantToSpawnOnShard;
 
         public Random Random;
         public Map Map;
@@ -38,6 +42,9 @@ namespace WindowsFormsApp1
             int maxTicksMeteoriteFalling,
             int maxTicksMeteoriteCracking,
             int maxTicksMeteoriteBeforeDissolving,
+            int chanceOfMeteoriteToFallOnMap,
+            int chanceOfHumanToSpawnOnShard,
+            int chanceOfPlantToSpawnOnShard,
             Map map)
         {
             Random = map.Random;
@@ -46,20 +53,40 @@ namespace WindowsFormsApp1
         }
 
 
-        public (int, int) GetRandCoordsOnMap()
+        public void EntityWasEaten<TFood>((int, int) XY)
+    where TFood : Edible
         {
-            return (Random.Next(Map.cols), Random.Next(Map.rows));
+            for (int i = 0; i < Map.Cells[XY.Item1, XY.Item2].OnCell.Count; i++)
+                if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is TFood)
+                {
+                    if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is Plant)
+                        plantSentry.DeletePlant((Plant)Map.Cells[XY.Item1, XY.Item2].OnCell[i]);
+                    else
+                        organismSentry.DeleteOrganism((Organism)Map.Cells[XY.Item1, XY.Item2].OnCell[i]);
+                }
         }
 
-        public void EntityWasMadeOnMap(Entity entity)
+        public (int, int) GetRandCoordsOnMap()
+        {
+            return (Random.Next(Map.Cols), Random.Next(Map.Rows));
+        }
+
+
+        public void EntityWasMadeOnCell(Entity entity)
         {
             Map.EntityWasMade(entity);
         }
 
-        public void EntityWasDestroyedOnMap(Entity entity)
+        public void EntityWasDestroyedOnCell(Entity entity)
         {
             Map.EntityWasDestroyed(entity);
         }
+
+        public int EntitiesAmountOnCell((int, int) XY)
+        {
+            return Map.Cells[XY.Item1, XY.Item2].OnCell.Count();
+        }
+
 
         public bool CheckBorders((int, int) XY)
         {
@@ -117,17 +144,38 @@ namespace WindowsFormsApp1
 
         }
 
-        public void EntityWasEaten<TFood>((int, int) XY)
-            where TFood : Edible
+        public void ShardKilledEverything((int, int) XY)
         {
-            for (int i = 0; i < Map.Cells[XY.Item1, XY.Item2].OnCell.Count; i++)
-                if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is TFood)
+            int orgsAndPlants = EntitiesAmountOnCell(XY);
+            for (int i = 0; i < orgsAndPlants - 1; i++)
+            {
+                EntityWasEaten<Edible>(XY);
+            }
+        }
+
+        public void ShardBecameSomething((int, int) XY)
+        {
+            int randNum = Random.Next(100);
+            if (randNum < chanceOfHumanToSpawnOnShard)
+            {
+                organismSentry.SetOrganismOnCurrentCell<Human>(XY);
+            }
+            else if (randNum < chanceOfHumanToSpawnOnShard + chanceOfPlantToSpawnOnShard)
+            {
+                randNum = Random.Next(3);
+                switch(randNum)
                 {
-                    if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is Plant)
-                        plantSentry.DeletePlant((Plant)Map.Cells[XY.Item1, XY.Item2].OnCell[i]);
-                    else
-                        organismSentry.DeleteOrganism((Organism)Map.Cells[XY.Item1, XY.Item2].OnCell[i]);
+                    case 0:
+                        plantSentry.SetPlantOnCurrentCell<Apple>(XY);
+                        break;
+                    case 1:
+                        plantSentry.SetPlantOnCurrentCell<Carrot>(XY);
+                        break;
+                    case 2:
+                        plantSentry.SetPlantOnCurrentCell<Oat>(XY);
+                        break;
                 }
+            }
         }
 
         public bool IsItDayToday()
