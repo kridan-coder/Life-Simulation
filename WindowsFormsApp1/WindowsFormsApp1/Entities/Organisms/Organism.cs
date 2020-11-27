@@ -133,7 +133,7 @@ namespace WindowsFormsApp1
             return (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Male, range, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeReproducing) + 1, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeBecomingGrass) + 1, StutterUntil, organismSentry });
         }
 
-        public static Organism MakeBaby((int, int)XY)
+        public static Organism MakeBaby((int, int)XY, OrganismSentry organismSentry)
         {
             bool babyMale;
             int babyRange;
@@ -166,7 +166,7 @@ namespace WindowsFormsApp1
                 {
                     changeValuesOnReproduce();
                     potentialPartner.changeValuesOnReproduce();
-                    MakeBaby((X,Y));
+                    MakeBaby((X,Y), organismSentry);
                 }
             }
         }

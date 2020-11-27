@@ -85,7 +85,7 @@ namespace WindowsFormsApp1
 
         public void ShardBecameSomething((int, int) XY)
         {
-            mainSentry.ShardKilledEverything(XY);
+            mainSentry.ShardBecameSomething(XY);
         }
         public void ShardWasMadeOnCell(MeteoriteShard shard)
         {

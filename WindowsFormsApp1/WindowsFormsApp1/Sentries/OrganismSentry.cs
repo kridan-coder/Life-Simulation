@@ -218,7 +218,7 @@ namespace WindowsFormsApp1
         public void SetOrganismOnCurrentCell<T>((int, int) XY)
     where T : Organism
         {
-            CreateOrganism(Organism<T, Edible>.MakeBaby(XY));
+            CreateOrganism(Organism<T, Edible>.MakeBaby(XY, this));
         }
     }
 }
