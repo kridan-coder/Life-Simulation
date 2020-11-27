@@ -13,5 +13,23 @@ namespace WindowsFormsApp1
 
         }
         public abstract void NextMove();
+
+        public abstract bool GetIsAlive();
+
+        public abstract bool GetGender();
+
+        public abstract bool GetReproduceWish();
+
+        public abstract bool GetFoodEatingWish();
+
+        public abstract int GetFullness();
+
+
+        public abstract int GetOrganismRange();
+
+        public abstract int GetBeforeBecomingPlant();
+
+        public abstract string GetOrganismType();
+
     }
 }

@@ -20,6 +20,8 @@ namespace WindowsFormsApp1
         public int NoReproduceUntil;
         public static int StutterUntil;
 
+        public Gender Gender;
+
         public bool Male;
 
         public int DeadFor = 0;
@@ -41,6 +43,46 @@ namespace WindowsFormsApp1
             IsAlive = true;
         }
 
+        public override bool GetIsAlive()
+        {
+            return IsAlive;
+        }
+
+        public override bool GetGender()
+        {
+            return Male;
+        }
+
+        public override bool GetReproduceWish()
+        {
+            return WantReproduce;
+        }
+
+        public override bool GetFoodEatingWish()
+        {
+            return WantFood;
+        }
+
+        public override int GetFullness()
+        {
+            return Fullness;
+        }
+
+
+        public override int GetOrganismRange()
+        {
+            return OrganismRange;
+        }
+
+        public override int GetBeforeBecomingPlant()
+        {
+            return (DeadUntil - DeadFor);
+        }
+
+        public override string GetOrganismType()
+        {
+            return typeof(T).Name;
+        }
         public override void NextMove()
         {
             Direction direction = Direction.None;
@@ -88,7 +130,7 @@ namespace WindowsFormsApp1
         public static Organism SetOrganism<Type>((int, int) XY, int range, bool Male) 
             where Type : Organism
         {
-            return (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Male, range, organismSentry.MaxOrgTicksBeforeReproducing, organismSentry.MaxOrgTicksBeforeBecomingGrass, StutterUntil, organismSentry });
+            return (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Male, range, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeReproducing) + 1, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeBecomingGrass) + 1, StutterUntil, organismSentry });
         }
 
         public static Organism MakeBaby((int, int)XY)

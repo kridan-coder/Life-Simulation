@@ -8,17 +8,17 @@ namespace WindowsFormsApp1
 {
     public class MeteoriteShard : Entity
     {
-        public MeteoriteSentry meteoriteSentry;
+        public Meteorite meteorite;
 
-        public MeteoriteShard(int _x, int _y, MeteoriteSentry meteoriteSentry) : base(_x, _y)
+        public MeteoriteShard(int _x, int _y, Meteorite meteorite) : base(_x, _y)
         {
-            this.meteoriteSentry = meteoriteSentry;
+            this.meteorite = meteorite;
         }
 
-        public static MeteoriteShard SetShard((int, int) XY, MeteoriteSentry meteoriteSentry)
+        public static MeteoriteShard SetShard((int, int) XY, Meteorite meteorite)
         {
-            if (meteoriteSentry.CanPlaceShardOnCell(XY))
-                return new MeteoriteShard(XY.Item1, XY.Item2, meteoriteSentry);
+            if (meteorite.CanPlaceShardOnCell(XY))
+                return new MeteoriteShard(XY.Item1, XY.Item2, meteorite);
             return null;  
         }
 

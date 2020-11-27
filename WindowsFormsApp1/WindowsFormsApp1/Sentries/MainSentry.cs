@@ -13,8 +13,6 @@ namespace WindowsFormsApp1
         public DayNightSentry dayNightSentry;
         public MeteoriteSentry meteoriteSentry;
 
-        private int maxAmountOfMeteoritesFallingSimultaneously;
-        private int chanceOfMeteoriteToFallOnMap;
         private int chanceOfHumanToSpawnOnShard;
         private int chanceOfPlantToSpawnOnShard;
 
@@ -53,9 +51,7 @@ namespace WindowsFormsApp1
             plantSentry = new PlantSentry(apples, applesGrowth, carrots, carrotsGrowth, oats, oatsGrowth, this);
             organismSentry = new OrganismSentry(humans, ticksHumanStutter, deers, ticksDeerStutter, mice, ticksMouseStutter, rabbits, ticksRabbitStutter, bears, ticksBearStutter, pigs, ticksPigStutter, raccoons, ticksRaccoonStutter, foxes, ticksFoxStutter, lions, ticksLionStutter, wolves, ticksWolfStutter, maxOrgVisionRange, maxOrgTicksBeforeReproducing, maxOrgTicksBeforeBecomingGrass, this);
             dayNightSentry = new DayNightSentry(dayNightChange, this);
-            meteoriteSentry = new MeteoriteSentry(this);
-            this.maxAmountOfMeteoritesFallingSimultaneously = maxAmountOfMeteoritesFallingSimultaneously;
-            this.chanceOfMeteoriteToFallOnMap = chanceOfMeteoriteToFallOnMap;
+            meteoriteSentry = new MeteoriteSentry(maxTicksMeteoriteFalling, maxTicksMeteoriteCracking, maxTicksMeteoriteBeforeDissolving, maxAmountOfMeteoritesFallingSimultaneously, chanceOfMeteoriteToFallOnMap, this);
             this.chanceOfHumanToSpawnOnShard = chanceOfHumanToSpawnOnShard;
             this.chanceOfPlantToSpawnOnShard = chanceOfPlantToSpawnOnShard;
         }
@@ -64,14 +60,15 @@ namespace WindowsFormsApp1
         {
             plantSentry.FirstTick();
             organismSentry.FirstTick();
+            meteoriteSentry.FirstTick();
         }
 
         public void NextTick()
         {
-            if (MeteoriteSentry.AmountOfActiveMeteorites < maxAmountOfMeteoritesFallingSimultaneously && Random.Next(100) < chanceOfMeteoriteToFallOnMap)
-            {
-
-            }
+            plantSentry.NextTick();
+            organismSentry.NextTick();
+            meteoriteSentry.NextTick();
+            dayNightSentry.NextTick();
         }
 
 
@@ -91,11 +88,12 @@ namespace WindowsFormsApp1
             Map.EntityWasDestroyed(entity);
         }
 
+
+
         public int EntitiesAmountOnCell((int, int) XY)
         {
             return Map.Cells[XY.Item1, XY.Item2].OnCell.Count();
         }
-
 
         public bool CheckBorders((int, int) XY)
         {

@@ -48,8 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\TimesOfDay.cs" />
     <Compile Include="Enums\Gender.cs" />
     <Compile Include="Sentries\MainSentry.cs" />
+    <Compile Include="Sentries\Meteorite.cs" />
     <Compile Include="Sentries\MeteoriteSentry.cs" />
     <Compile Include="Sentries\DayNightSentry.cs" />
     <Compile Include="Sentries\OrganismSentry.cs" />

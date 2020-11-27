@@ -12,6 +12,8 @@ namespace WindowsFormsApp1
         public int DayOrNightLastsFor = 0;
         public int UntilDayOrNight;
 
+        public TimesOfDay TimeOfDay;
+
         MainSentry mainSentry;
         public void NextTick()
         {

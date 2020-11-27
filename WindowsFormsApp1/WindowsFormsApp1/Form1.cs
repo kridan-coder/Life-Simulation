@@ -23,9 +23,7 @@ namespace WindowsFormsApp1
         }
 
         Runner runner;
-        Herbivore observedHerbivore = null;
-        Omnivore observedOmnivore = null;
-        Predatory observedPredatory = null;
+        Organism observedOrganism;
         
         private Graphics graphics;
         int resolution;
@@ -36,6 +34,50 @@ namespace WindowsFormsApp1
             timer1.Start();
         }
 
+        private (Brush, Brush, Brush) chooseOrganismColor(Organism organism)
+        {
+            if (organism is Human)
+            {
+                return (Brushes.Yellow, Brushes.Yellow, Brushes.Yellow);
+            }
+            else if (organism is Bear)
+            {
+                return (Brushes.Brown, Brushes.Brown, Brushes.Brown);
+            }
+            else if (organism is Pig)
+            {
+                return (Brushes.Pink, Brushes.Pink, Brushes.Pink);
+            }
+            else if (organism is Raccoon)
+            {
+                return (Brushes.Gray, Brushes.Gray, Brushes.Gray);
+            }
+            else if (organism is Deer)
+            {
+                return (Brushes.RosyBrown, Brushes.RosyBrown, Brushes.RosyBrown);
+            }
+            else if (organism is Mouse)
+            {
+                return (Brushes.White, Brushes.White, Brushes.White);
+            }
+            else if (organism is Rabbit)
+            {
+                return (Brushes.FloralWhite, Brushes.FloralWhite, Brushes.FloralWhite);
+            }
+            else if (organism is Fox)
+            {
+                return (Brushes.Orange, Brushes.Orange, Brushes.Orange);
+            }
+            else if (organism is Lion)
+            {
+                return (Brushes.LightYellow, Brushes.LightYellow, Brushes.LightYellow);
+            }
+            else if (organism is Wolf)
+            {
+                return (Brushes.LightSlateGray, Brushes.LightSlateGray, Brushes.LightSlateGray);
+            }
+            return (Brushes.Blue, Brushes.Blue, Brushes.Blue);
+        }
         private void paintOrg(int x, int y, bool isAlive, bool male, Brush ifMale, Brush ifFemale, Brush ifDead)
         {
             if (isAlive)
@@ -48,24 +90,22 @@ namespace WindowsFormsApp1
             else
                 graphics.FillEllipse(ifDead, x * (int)resolutionUpDown.Value, y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
         }
-        private void paintObservedOrg(int x, int y)
+        private void paintObservedOrg((int, int) XY)
         {
-            graphics.FillEllipse(Brushes.DarkOrange, x * (int)resolutionUpDown.Value, y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+            graphics.FillEllipse(Brushes.DarkOrange, XY.Item1 * (int)resolutionUpDown.Value, XY.Item2 * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
             pictureBox1.Refresh();
         }
 
-        private void clearOldObservedOrganisms()
+        private void clearOldObservedOrganism()
         {
-            if (observedHerbivore != null)
-                paintOrg(observedHerbivore.x, observedHerbivore.y, observedHerbivore.isAlive, observedHerbivore.male, Brushes.DarkBlue, Brushes.SlateBlue, Brushes.LightGray);
-            if (observedOmnivore != null)
-                paintOrg(observedOmnivore.x, observedOmnivore.y, observedOmnivore.isAlive, observedOmnivore.male, Brushes.DarkViolet, Brushes.Violet, Brushes.Gray);
-            if (observedPredatory != null)
-                paintOrg(observedPredatory.x, observedPredatory.y, observedPredatory.isAlive, observedPredatory.male, Brushes.DarkRed, Brushes.Red, Brushes.DarkGray);
-
+            if (observedOrganism != null)
+            {
+                (Brush, Brush, Brush) orgColors = chooseOrganismColor(observedOrganism);
+                paintOrg(observedOrganism.X, observedOrganism.Y, observedOrganism.GetIsAlive(), observedOrganism.GetGender(), orgColors.Item1, orgColors.Item2, orgColors.Item3);
+            }
         }
 
-        private void refreshOrgShowingInfo(bool alive, bool male, bool wantReproduce, bool wantFood, int fullness, int x, int y, int ID, int visionRange, int deadUntil, int deadFor, string animalType)
+        private void refreshOrgShowingInfo(bool alive, bool male, bool wantReproduce, bool wantFood, int fullness, int x, int y, int ID, int visionRange, int beforeBecomingPlant, string animalType)
         {
             sexLabel.Text = $"{((male) ? "Male" : "Female") }";
             hungerLabel.Text = $"{fullness.ToString()}";
@@ -88,53 +128,26 @@ namespace WindowsFormsApp1
                 labelReproduce.Text = "Bruh";
                 labelWantEat.Text = "Bruh";
                 deadOrAliveLabel.Text = "Dead";
-                labelInfoBecomeGrass.Text = "Become grass in: ";
-                labelBecomeGrass.Text = $"{(deadUntil - deadFor).ToString()}";
+                labelInfoBecomeGrass.Text = "Become plant in: ";
+                labelBecomeGrass.Text = $"{(beforeBecomingPlant).ToString()}";
             }
             paintObservedOrg(x,y);
 
         }
 
 
-        private void getInfoAboutObservedHerbivore(int x, int y)
+        private void getInfoAboutObservedOrganism((int, int) XY)
         {
             // no need for old ones
-            clearOldObservedOrganisms();
-            observedHerbivore = runner.TryToGetHerbivore(x, y);
-            if (observedHerbivore != null)
+            clearOldObservedOrganism();
+            observedOrganism = runner.TryToGetOrganism(XY);
+            if (observedOrganism != null)
             {
-                observedOmnivore = null;
-                observedPredatory = null;
-                refreshOrgShowingInfo(observedHerbivore.isAlive, observedHerbivore.male, observedHerbivore.wantReproduce, observedHerbivore.wantFood, observedHerbivore.fullness, observedHerbivore.x, observedHerbivore.y, observedHerbivore.orgID, observedHerbivore.organismRange, observedHerbivore.deadUntil, observedHerbivore.deadFor, "Herbivore");
-                paintObservedOrg(x, y);
+                refreshOrgShowingInfo(observedOrganism.GetIsAlive(), observedOrganism.GetGender(), observedHerbivore.wantReproduce, observedHerbivore.wantFood, observedHerbivore.fullness, observedOrganism.X, observedOrganism.Y, observedOrganism.ID, observedHerbivore.organismRange, observedHerbivore.beforeBecomingPlant, "Herbivore");
+                paintObservedOrg(XY);
             }
         }
-        private void getInfoAboutObservedOmnivore(int x, int y)
-        {
-            // no need for old ones
-            clearOldObservedOrganisms();
-            observedOmnivore = runner.TryToGetOmnivore(x, y);
-            if (observedOmnivore != null)
-            {
-                observedHerbivore = null;
-                observedPredatory = null;
-                refreshOrgShowingInfo(observedOmnivore.isAlive, observedOmnivore.male, observedOmnivore.wantReproduce, observedOmnivore.wantFood, observedOmnivore.fullness, observedOmnivore.x, observedOmnivore.y, observedOmnivore.orgID, observedOmnivore.organismRange, observedOmnivore.deadUntil, observedOmnivore.deadFor, "Omnivore");
-                paintObservedOrg(x, y);
-            }
-        }
-        private void getInfoAboutObservedPredatory(int x, int y)
-        {
-            // no need for old ones
-            clearOldObservedOrganisms();
-            observedPredatory = runner.TryToGetPredatory(x, y);
-            if (observedPredatory != null)
-            {
-                observedHerbivore = null;
-                observedOmnivore = null;
-                refreshOrgShowingInfo(observedPredatory.isAlive, observedPredatory.male, observedPredatory.wantReproduce, observedPredatory.wantFood, observedPredatory.fullness, observedPredatory.x, observedPredatory.y, observedPredatory.orgID, observedPredatory.organismRange, observedPredatory.deadUntil, observedPredatory.deadFor, "Predatory");
-                paintObservedOrg(x, y);
-            }
-        }
+
         private void refreshInfoAboutDay()
         {
             if (runner.IsItDayToday())
@@ -190,12 +203,10 @@ namespace WindowsFormsApp1
         {
             if (runner != null)
             {
-                int x = e.Location.X / resolution;
-                int y = e.Location.Y / resolution;
-                getInfoAboutObservedHerbivore(x, y);
-                getInfoAboutObservedOmnivore(x, y);
-                getInfoAboutObservedPredatory(x, y);
-
+                (int, int) XY;
+                XY.Item1 = e.Location.X / resolution;
+                XY.Item2 = e.Location.Y / resolution;
+                getInfoAboutObservedOrganism(XY);
             }
         }
         public void InitGraphics()
@@ -204,7 +215,7 @@ namespace WindowsFormsApp1
             pictureBox1.Image = new Bitmap(runner.Cols() * (int)resolutionUpDown.Value, runner.Rows() * (int)resolutionUpDown.Value);
             graphics = Graphics.FromImage(pictureBox1.Image);
         }
-        public void DrawCanvas(List<Plant> plants, List<Herbivore> herbivores, List<Predatory> predators, List<Omnivore> omnivores, List<MeteoriteShard> shards, bool day)
+        public void DrawCanvas(Map map)
         {
 
             if (resolution != (int)resolutionUpDown.Value)
