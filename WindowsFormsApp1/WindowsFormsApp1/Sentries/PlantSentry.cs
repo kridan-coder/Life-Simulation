@@ -56,7 +56,7 @@ namespace WindowsFormsApp1
 
         public bool CanGrowOnCell((int, int) XY)
         {
-            return !(mainSentry.IsOnCell<Organism>(XY)) && !(mainSentry.IsOnCell<Plant>(XY));
+            return mainSentry.CheckBorders(XY) && !(mainSentry.IsOnCell<Organism>(XY)) && !(mainSentry.IsOnCell<Plant>(XY));
         }
 
         private void setPlantsRandomly()
@@ -85,7 +85,7 @@ namespace WindowsFormsApp1
         private void setPlantRandomly<T>()
             where T : Plant
         {
-            Plant.RandSpawn<T>(this);
+            CreatePlant(Plant.RandSpawn<T>(this));
             //if (typeof(Apple) is T)
             //    CreatePlant(Plant.RandSpawn<Apple>(this));
             //else if (typeof(Carrot) is T)

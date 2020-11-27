@@ -120,14 +120,14 @@ namespace WindowsFormsApp1
                 XY = organismSentry.GetRandCoordsOnMap();
                 if (organismSentry.CellIsEmpty(XY))
                 {
-                    Male = randomSex();
+                    Male = randomSex(organismSentry);
                     orgRange = randomVisionRange(organismSentry);
-                    return SetOrganism<T>(XY, orgRange, Male);
+                    return SetOrganism<T>(XY, orgRange, Male, organismSentry);
                 }
             }
         }
 
-        public static Organism SetOrganism<Type>((int, int) XY, int range, bool Male) 
+        public static Organism SetOrganism<Type>((int, int) XY, int range, bool Male, OrganismSentry organismSentry) 
             where Type : Organism
         {
             return (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Male, range, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeReproducing) + 1, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeBecomingGrass) + 1, StutterUntil, organismSentry });
@@ -137,12 +137,12 @@ namespace WindowsFormsApp1
         {
             bool babyMale;
             int babyRange;
-            babyMale = randomSex();
+            babyMale = randomSex(organismSentry);
             babyRange = randomVisionRange(organismSentry);
-            return SetOrganism<T>(XY, babyRange, babyMale);
+            return SetOrganism<T>(XY, babyRange, babyMale, organismSentry);
         }
 
-        private static bool randomSex()
+        private static bool randomSex(OrganismSentry organismSentry)
         {
             return organismSentry.Random.Next(100) > 50;
         }

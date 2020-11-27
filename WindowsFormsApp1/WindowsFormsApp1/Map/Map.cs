@@ -43,6 +43,8 @@ namespace WindowsFormsApp1
             int chanceOfHumanToSpawnOnShard,
             int chanceOfPlantToSpawnOnShard)
         {
+            this.Rows = Rows;
+            this.Cols = Cols;
             Cells = new Cell[Cols, Rows];
             for (int i = 0; i < Cols; i++)
                 for (int j = 0; j < Rows; j++)

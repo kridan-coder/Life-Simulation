@@ -78,6 +78,17 @@ namespace WindowsFormsApp1
             }
             return (Brushes.Blue, Brushes.Blue, Brushes.Blue);
         }
+
+        private Brush choosePlantColor(Plant plant)
+        {
+            if (plant is Apple)
+                return Brushes.Green;
+            else if (plant is Carrot)
+                return Brushes.Red;
+            else if (plant is Oat)
+                return Brushes.DarkOliveGreen;
+            return Brushes.Purple;
+        }
         private void paintOrg(int x, int y, bool isAlive, bool male, Brush ifMale, Brush ifFemale, Brush ifDead)
         {
             if (isAlive)
@@ -131,7 +142,7 @@ namespace WindowsFormsApp1
                 labelInfoBecomeGrass.Text = "Become plant in: ";
                 labelBecomeGrass.Text = $"{(beforeBecomingPlant).ToString()}";
             }
-            paintObservedOrg(x,y);
+            paintObservedOrg((x,y));
 
         }
 
@@ -143,7 +154,7 @@ namespace WindowsFormsApp1
             observedOrganism = runner.TryToGetOrganism(XY);
             if (observedOrganism != null)
             {
-                refreshOrgShowingInfo(observedOrganism.GetIsAlive(), observedOrganism.GetGender(), observedHerbivore.wantReproduce, observedHerbivore.wantFood, observedHerbivore.fullness, observedOrganism.X, observedOrganism.Y, observedOrganism.ID, observedHerbivore.organismRange, observedHerbivore.beforeBecomingPlant, "Herbivore");
+                refreshOrgShowingInfo(observedOrganism.GetIsAlive(), observedOrganism.GetGender(), observedOrganism.GetReproduceWish(), observedOrganism.GetFoodEatingWish(), observedOrganism.GetFullness(), observedOrganism.X, observedOrganism.Y, observedOrganism.ID, observedOrganism.GetOrganismRange(), observedOrganism.GetBeforeBecomingPlant(), observedOrganism.GetOrganismType());
                 paintObservedOrg(XY);
             }
         }
@@ -222,58 +233,46 @@ namespace WindowsFormsApp1
                 // resolution changed
                 InitGraphics();
 
-            if (day)
+            if (map.mainSentry.dayNightSentry.Day)
                 graphics.Clear(Color.Cornsilk);
             else
                 graphics.Clear(Color.DarkSlateBlue);
 
             // show shards
-            if (shards != null)
-            {
-                foreach (var shard in shards)
+
+            foreach (var meteorite in map.mainSentry.meteoriteSentry.Meteorites) {
+                foreach (var shard in meteorite.MeteoriteShards)
                 {
-                    if (!shard.meteorite.hasFallen)
+                    if (!shard.meteorite.HasFallen)
                     {
-                        graphics.FillRectangle(Brushes.Black, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                        graphics.FillRectangle(Brushes.Black, shard.X * (int)resolutionUpDown.Value, shard.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                     }
-                    else if (shard.meteorite.hasFallen && !shard.meteorite.becameCold)
+                    else if (shard.meteorite.HasFallen && !shard.meteorite.BecameCold)
                     {
-                        graphics.FillRectangle(Brushes.Orange, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                        graphics.FillRectangle(Brushes.Orange, shard.X * (int)resolutionUpDown.Value, shard.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                     }
-                    else if (shard.meteorite.becameCold)
+                    else if (shard.meteorite.BecameCold)
                     {
-                        graphics.FillRectangle(Brushes.DarkCyan, shard.x * (int)resolutionUpDown.Value, shard.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                        graphics.FillRectangle(Brushes.DarkCyan, shard.X * (int)resolutionUpDown.Value, shard.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                     }
                 }
             }
 
+
             // show plants
-            foreach (var plant in plants)
-                graphics.FillRectangle(Brushes.YellowGreen, plant.x * (int)resolutionUpDown.Value, plant.y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+            foreach (var plant in map.mainSentry.plantSentry.Plants)
+                graphics.FillRectangle(choosePlantColor(plant), plant.X * (int)resolutionUpDown.Value, plant.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
 
 
 
-            // show herbivores
-            foreach (var herbivore in herbivores)
-                paintOrg(herbivore.x, herbivore.y, herbivore.isAlive, herbivore.male, Brushes.DarkBlue, Brushes.SlateBlue, Brushes.LightGray);
+            // show orgs
+            foreach (var organism in map.mainSentry.organismSentry.Organisms)
+                paintOrg(organism.X, organism.Y, organism.GetIsAlive(), organism.GetGender(), chooseOrganismColor(organism).Item1, chooseOrganismColor(organism).Item2, chooseOrganismColor(organism).Item3);
+            
 
+            if (observedOrganism != null)
+                refreshOrgShowingInfo(observedOrganism.GetIsAlive(), observedOrganism.GetGender(), observedOrganism.GetReproduceWish(), observedOrganism.GetFoodEatingWish(), observedOrganism.GetFullness(), observedOrganism.X, observedOrganism.Y, observedOrganism.ID, observedOrganism.GetOrganismRange(), observedOrganism.GetBeforeBecomingPlant(), observedOrganism.GetOrganismType());
 
-            // show predators
-            foreach (var predator in predators)
-                paintOrg(predator.x, predator.y, predator.isAlive, predator.male, Brushes.DarkRed, Brushes.Red, Brushes.DarkGray);
-
-
-            // show omnivores
-            foreach (var omnivore in omnivores)
-                paintOrg(omnivore.x, omnivore.y, omnivore.isAlive, omnivore.male, Brushes.DarkViolet, Brushes.Violet, Brushes.Gray);
-
-
-            if (observedHerbivore != null)
-                refreshOrgShowingInfo(observedHerbivore.isAlive, observedHerbivore.male, observedHerbivore.wantReproduce, observedHerbivore.wantFood, observedHerbivore.fullness, observedHerbivore.x, observedHerbivore.y, observedHerbivore.orgID, observedHerbivore.organismRange, observedHerbivore.deadUntil, observedHerbivore.deadFor, "Herbivore");
-            else if (observedOmnivore != null)
-                refreshOrgShowingInfo(observedOmnivore.isAlive, observedOmnivore.male, observedOmnivore.wantReproduce, observedOmnivore.wantFood, observedOmnivore.fullness, observedOmnivore.x, observedOmnivore.y, observedOmnivore.orgID, observedOmnivore.organismRange, observedOmnivore.deadUntil, observedOmnivore.deadFor, "Omnivore");
-            else if (observedPredatory != null)
-                refreshOrgShowingInfo(observedPredatory.isAlive, observedPredatory.male, observedPredatory.wantReproduce, observedPredatory.wantFood, observedPredatory.fullness, observedPredatory.x, observedPredatory.y, observedPredatory.orgID, observedPredatory.organismRange, observedPredatory.deadUntil, observedPredatory.deadFor, "Predatory");
 
             refreshInfoAboutDay();
             pictureBox1.Refresh();
