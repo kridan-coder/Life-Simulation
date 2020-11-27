@@ -91,6 +91,7 @@ namespace WindowsFormsApp1
                 checkFood();
                 checkReproduce();
                 direction = makeDecision(direction);
+                string myTFood = typeof(TFood).Name;
                 makeMove(direction);
             }
             else if (deadLongEnough())
@@ -122,12 +123,12 @@ namespace WindowsFormsApp1
                 {
                     Male = randomSex(organismSentry);
                     orgRange = randomVisionRange(organismSentry);
-                    return SetOrganism<T>(XY, orgRange, Male, organismSentry);
+                    return SetOrganism<T>(XY, orgRange, Male, StutterUntil, organismSentry);
                 }
             }
         }
 
-        public static Organism SetOrganism<Type>((int, int) XY, int range, bool Male, OrganismSentry organismSentry) 
+        public static Organism SetOrganism<Type>((int, int) XY, int range, bool Male, int StutterUntil, OrganismSentry organismSentry) 
             where Type : Organism
         {
             return (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Male, range, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeReproducing) + 1, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeBecomingGrass) + 1, StutterUntil, organismSentry });
@@ -139,7 +140,7 @@ namespace WindowsFormsApp1
             int babyRange;
             babyMale = randomSex(organismSentry);
             babyRange = randomVisionRange(organismSentry);
-            return SetOrganism<T>(XY, babyRange, babyMale, organismSentry);
+            return SetOrganism<T>(XY, babyRange, babyMale, StutterUntil, organismSentry);
         }
 
         private static bool randomSex(OrganismSentry organismSentry)
@@ -166,7 +167,7 @@ namespace WindowsFormsApp1
                 {
                     changeValuesOnReproduce();
                     potentialPartner.changeValuesOnReproduce();
-                    MakeBaby((X,Y), organismSentry);
+                    organismSentry.CreateOrganism(MakeBaby((X,Y), organismSentry));
                 }
             }
         }

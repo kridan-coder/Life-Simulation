@@ -99,8 +99,17 @@ namespace WindowsFormsApp1
         {
             int rand_ind;
             Plant potentialPlant;
-            rand_ind = Random.Next(Plants.Count);
-            potentialPlant = Plants[rand_ind].Grow<T>();
+
+            List<Plant> exactPlants = new List<Plant>();
+            for (int i = 0; i < Plants.Count; i++)
+            {
+                if (Plants[i] is T)
+                    exactPlants.Add(Plants[i]);
+            }
+            
+            rand_ind = Random.Next(exactPlants.Count);
+
+            potentialPlant = exactPlants[rand_ind].Grow<T>();
             if (potentialPlant != null)
             {
                 CreatePlant(potentialPlant);

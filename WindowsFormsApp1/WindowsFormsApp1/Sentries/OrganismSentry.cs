@@ -11,16 +11,26 @@ namespace WindowsFormsApp1
     {
         public List<Organism> Organisms;
 
-        private int humansAmount, ticksHumanStutter;
-        private int deersAmount, ticksDeerStutter;
-        private int miceAmount, ticksMouseStutter;
-        private int rabbitsAmount, ticksRabbitStutter;
-        private int bearsAmount, ticksBearStutter;
-        private int pigsAmount, ticksPigStutter;
-        private int raccoonsAmount, ticksRaccoonStutter;
-        private int foxesAmount, ticksFoxStutter;
-        private int lionsAmount, ticksLionStutter;
-        private int wolvesAmount, ticksWolfStutter;
+        private int humansAmount;
+        public int TicksHumanStutter;
+        private int deersAmount;
+        public int TicksDeerStutter;
+        private int miceAmount;
+        public int TicksMouseStutter;
+        private int rabbitsAmount;
+        public int TicksRabbitStutter;
+        private int bearsAmount;
+        public int TicksBearStutter;
+        private int pigsAmount;
+        public int TicksPigStutter;
+        private int raccoonsAmount;
+        public int TicksRaccoonStutter;
+        private int foxesAmount;
+        public int TicksFoxStutter;
+        private int lionsAmount;
+        public int TicksLionStutter;
+        private int wolvesAmount;
+        public int TicksWolfStutter;
 
         public int MaxOrgVisionRange;
         public int MaxOrgTicksBeforeReproducing;
@@ -46,34 +56,34 @@ namespace WindowsFormsApp1
             MainSentry mainSentry)
         {
             humansAmount = humans;
-            this.ticksHumanStutter = ticksHumanStutter;
+            TicksHumanStutter = ticksHumanStutter;
 
             deersAmount = deers;
-            this.ticksDeerStutter = ticksDeerStutter;
+            TicksDeerStutter = ticksDeerStutter;
 
             miceAmount = mice;
-            this.ticksMouseStutter = ticksMouseStutter;
+            TicksMouseStutter = ticksMouseStutter;
 
             rabbitsAmount = rabbits;
-            this.ticksRabbitStutter = ticksRabbitStutter;
+            TicksRabbitStutter = ticksRabbitStutter;
 
             bearsAmount = bears;
-            this.ticksBearStutter = ticksBearStutter;
+            TicksBearStutter = ticksBearStutter;
 
             pigsAmount = pigs;
-            this.ticksPigStutter = ticksPigStutter;
+            TicksPigStutter = ticksPigStutter;
 
             raccoonsAmount = raccoons;
-            this.ticksRaccoonStutter = ticksRaccoonStutter;
+            TicksRaccoonStutter = ticksRaccoonStutter;
 
             foxesAmount = foxes;
-            this.ticksFoxStutter = ticksFoxStutter;
+            TicksFoxStutter = ticksFoxStutter;
 
             lionsAmount = lions;
-            this.ticksDeerStutter = ticksLionStutter;
+            TicksDeerStutter = ticksLionStutter;
 
             wolvesAmount = wolves;
-            this.ticksWolfStutter = ticksWolfStutter;
+            TicksWolfStutter = ticksWolfStutter;
 
             MaxOrgVisionRange = maxOrgVisionRange;
             MaxOrgTicksBeforeReproducing = maxOrgTicksBeforeReproducing;
@@ -88,6 +98,7 @@ namespace WindowsFormsApp1
 
         public void FirstTick()
         {
+            setStutters();
             setOrganismsRandomly();
         }
 
@@ -102,6 +113,19 @@ namespace WindowsFormsApp1
                 Organisms[i].NextMove();
         }
 
+        private void setStutters()
+        {
+            Organism<Human, Edible>.StutterUntil = TicksHumanStutter;
+            Organism<Deer, Edible>.StutterUntil = TicksDeerStutter;
+            Organism<Mouse, Edible>.StutterUntil = TicksMouseStutter;
+            Organism<Rabbit, Edible>.StutterUntil = TicksRabbitStutter;
+            Organism<Bear, Edible>.StutterUntil = TicksBearStutter;
+            Organism<Pig, Edible>.StutterUntil = TicksPigStutter;
+            Organism<Raccoon, Edible>.StutterUntil = TicksRaccoonStutter;
+            Organism<Fox, Edible>.StutterUntil = TicksFoxStutter;
+            Organism<Lion, Edible>.StutterUntil = TicksLionStutter;
+            Organism<Wolf, Edible>.StutterUntil = TicksWolfStutter;
+        }
         private void setOrganismsRandomly()
         {
             for (int i = 0; i < humansAmount; i++)
@@ -132,6 +156,51 @@ namespace WindowsFormsApp1
             CreateOrganism(Organism<T, Edible>.RandSpawn(this));
         }
 
+        //public int GetStutter<T>()
+        //    where T : Edible
+        //{
+        //    if (typeof(EdibleForHuman) is T)
+        //    {
+        //        return TicksHumanStutter;
+        //    }
+        //    else if (typeof(Bear) is T)
+        //    {
+        //        return TicksBearStutter;
+        //    }
+        //    else if (typeof(Pig) is T)
+        //    {
+        //        return TicksPigStutter;
+        //    }
+        //    else if (typeof(Raccoon) is T)
+        //    {
+        //        return TicksRaccoonStutter;
+        //    }
+        //    else if (typeof(Deer) is T)
+        //    {
+        //        return TicksDeerStutter;
+        //    }
+        //    else if (typeof(Mouse) is T)
+        //    {
+        //        return TicksMouseStutter;
+        //    }
+        //    else if (typeof(Rabbit) is T)
+        //    {
+        //        return TicksRabbitStutter;
+        //    }
+        //    else if (typeof(Fox) is T)
+        //    {
+        //        return TicksFoxStutter;
+        //    }
+        //    else if (typeof(Lion) is T)
+        //    {
+        //        return TicksLionStutter;
+        //    }
+        //    else if (typeof(Wolf) is T)
+        //    {
+        //        return TicksWolfStutter;
+        //    }
+        //    return 0;
+        //}
 
 
         public bool IsItDayToday()

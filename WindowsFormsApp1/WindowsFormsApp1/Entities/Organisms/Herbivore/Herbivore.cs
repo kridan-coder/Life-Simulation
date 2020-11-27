@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace WindowsFormsApp1
 {
     // травоядное
-    public class Herbivore<T, TFood> : Organism<T, EdibleForHerbivore>, EdibleForPredatory, EdibleForOmnivore
+    public abstract class Herbivore<T, TFood> : Organism<T, TFood>, EdibleForPredatory, EdibleForOmnivore
         where T : Organism
         where TFood : EdibleForHerbivore
     {

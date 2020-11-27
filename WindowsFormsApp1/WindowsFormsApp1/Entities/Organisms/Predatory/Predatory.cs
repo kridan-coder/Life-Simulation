@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace WindowsFormsApp1
 {
     // хищный
-    public class Predatory<T, TFood> : Organism<T, EdibleForPredatory>, EdibleForOmnivore
+    public abstract class Predatory<T, TFood> : Organism<T, TFood>, EdibleForOmnivore
         where T : Organism
         where TFood : EdibleForPredatory
     {

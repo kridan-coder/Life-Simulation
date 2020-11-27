@@ -10,20 +10,20 @@ namespace WindowsFormsApp1
     public class Runner
     {
         // organisms set
-        private const int humans = 50; private const int ticksHumanStutter = 5;
-        private const int deers = 40; private const int ticksDeerStutter = 6;
+        private const int humans = 50; private const int ticksHumanStutter = 1;
+        private const int deers = 40; private const int ticksDeerStutter = 2;
         private const int mice = 250; private const int ticksMouseStutter = 0;
-        private const int rabbits = 100; private const int ticksRabbitStutter = 7;
-        private const int bears = 30; private const int ticksBearStutter = 9;
-        private const int pigs = 150; private const int ticksPigStutter = 4;
-        private const int raccoons = 90; private const int ticksRaccoonStutter = 2;
-        private const int foxes = 80; private const int ticksFoxStutter = 2;
-        private const int lions = 30; private const int ticksLionStutter = 5;
-        private const int wolves = 110; private const int ticksWolfStutter = 3;
+        private const int rabbits = 100; private const int ticksRabbitStutter = 1;
+        private const int bears = 30; private const int ticksBearStutter = 2;
+        private const int pigs = 150; private const int ticksPigStutter = 1;
+        private const int raccoons = 90; private const int ticksRaccoonStutter = 1;
+        private const int foxes = 80; private const int ticksFoxStutter = 1;
+        private const int lions = 30; private const int ticksLionStutter = 1;
+        private const int wolves = 110; private const int ticksWolfStutter = 1;
 
         // organisms options
         private const int maxOrgVisionRange = 100;
-        private const int maxOrgTicksBeforeReproducing = 150;
+        private const int maxOrgTicksBeforeReproducing = 300;
         private const int maxOrgTicksBeforeBecomingGrass = 200;
 
         // plants set

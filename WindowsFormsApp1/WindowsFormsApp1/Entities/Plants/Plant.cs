@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
 {
-    public abstract class Plant : Entity, EdibleForHerbivore, EdibleForOmnivore {
+    public abstract class Plant : Entity//, EdibleForHerbivore, EdibleForOmnivore
+    {
         private static PlantSentry plantSentry;
         private static void setPlantSentry(PlantSentry _plantSentry)
         {
