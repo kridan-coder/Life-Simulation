@@ -48,13 +48,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\House\HousePart.cs" />
     <Compile Include="Enums\TimesOfDay.cs" />
-    <Compile Include="Enums\Gender.cs" />
+    <Compile Include="Enums\Sex.cs" />
     <Compile Include="Sentries\MainSentry.cs" />
+    <Compile Include="Sentries\House.cs" />
     <Compile Include="Sentries\Meteorite.cs" />
+    <Compile Include="Sentries\HouseSentry.cs" />
     <Compile Include="Sentries\MeteoriteSentry.cs" />
     <Compile Include="Sentries\DayNightSentry.cs" />
-    <Compile Include="Sentries\OrganismSentry.cs" />
+    <Compile Include="Sentries\HumanSentry.cs" />
+    <Compile Include="Sentries\AnimalSentry.cs" />
     <Compile Include="Enums\Directions.cs" />
     <Compile Include="Entities\Organisms\Herbivore\Rabbit.cs" />
     <Compile Include="Entities\Organisms\Herbivore\Mouse.cs" />

@@ -10,7 +10,7 @@ namespace WindowsFormsApp1
     public class Runner
     {
         // organisms set
-        private const int humans = 50; private const int ticksHumanStutter = 1;
+        private const int humans = 0; private const int ticksHumanStutter = 1;
         private const int deers = 40; private const int ticksDeerStutter = 2;
         private const int mice = 250; private const int ticksMouseStutter = 0;
         private const int rabbits = 100; private const int ticksRabbitStutter = 1;
@@ -36,7 +36,7 @@ namespace WindowsFormsApp1
         private const int chanceOfHumanToSpawnOnShard = 1; // out of 100
         private const int chanceOfPlantToSpawnOnShard = 0; // out of 100
         // chanceOfNothingToSpawnOnShard = 100 - chanceOfHumanToSpawnOnShard - chanceOfPlantToSpawnOnShard
-        private const int maxAmountOfMeteoritesFallingSimultaneously = 20;
+        private const int maxAmountOfMeteoritesFallingSimultaneously = 3;
         private const int maxTicksMeteoriteFalling = 15;
         private const int maxTicksMeteoriteCracking = 10;
         private const int maxTicksMeteoriteBeforeDissolving = 15;

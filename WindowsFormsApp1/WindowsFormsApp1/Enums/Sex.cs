@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
 {       
-    public enum Gender
+    public enum Sex
     {
         Male,
         Female

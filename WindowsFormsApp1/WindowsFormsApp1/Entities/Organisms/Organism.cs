@@ -10,7 +10,7 @@ namespace WindowsFormsApp1
         where T : Organism
         where TFood : Edible
     {
-        private static OrganismSentry organismSentry;
+        private static AnimalSentry organismSentry;
 
         public bool IsAlive;
 
@@ -20,9 +20,7 @@ namespace WindowsFormsApp1
         public int NoReproduceUntil;
         public static int StutterUntil;
 
-        public Gender Gender;
-
-        public bool Male;
+        public Sex Sex;
 
         public int DeadFor = 0;
         public int ReproducedFor = 0;
@@ -32,11 +30,11 @@ namespace WindowsFormsApp1
         public bool WantFood = false;
         public bool WantReproduce = false;
 
-        public Organism(int _x, int _y, bool _male, int _range, int _rollBack, int _deadUntil, int _stutter, OrganismSentry _organismSentry) : base(_x, _y)
+        public Organism(int _x, int _y, Sex _sex, int _range, int _rollBack, int _deadUntil, int _stutter, AnimalSentry _organismSentry) : base(_x, _y)
         {
             organismSentry = _organismSentry;
             StutterUntil = _stutter;
-            Male = _male;
+            Sex = _sex;
             OrganismRange = _range;
             DeadUntil = _deadUntil;
             NoReproduceUntil = _rollBack;
@@ -48,9 +46,9 @@ namespace WindowsFormsApp1
             return IsAlive;
         }
 
-        public override bool GetGender()
+        public override Sex GetSex()
         {
-            return Male;
+            return Sex;
         }
 
         public override bool GetReproduceWish()
@@ -111,44 +109,44 @@ namespace WindowsFormsApp1
             organismSentry.OrganismBecamePlant(this);
         }
 
-        public static Organism RandSpawn(OrganismSentry organismSentry)
+        public static Organism RandSpawn(AnimalSentry organismSentry)
         {
             (int, int) XY;
             int orgRange;
-            bool Male;
+            Sex Sex;
             while (true)
             {
                 XY = organismSentry.GetRandCoordsOnMap();
                 if (organismSentry.CellIsEmpty(XY))
                 {
-                    Male = randomSex(organismSentry);
+                    Sex = randomSex(organismSentry);
                     orgRange = randomVisionRange(organismSentry);
-                    return SetOrganism<T>(XY, orgRange, Male, StutterUntil, organismSentry);
+                    return SetOrganism<T>(XY, orgRange, Sex, StutterUntil, organismSentry);
                 }
             }
         }
 
-        public static Organism SetOrganism<Type>((int, int) XY, int range, bool Male, int StutterUntil, OrganismSentry organismSentry) 
+        public static Organism SetOrganism<Type>((int, int) XY, int range, Sex Sex, int StutterUntil, AnimalSentry organismSentry) 
             where Type : Organism
         {
-            return (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Male, range, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeReproducing) + 1, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeBecomingGrass) + 1, StutterUntil, organismSentry });
+            return (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Sex, range, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeReproducing) + 1, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeBecomingGrass) + 1, StutterUntil, organismSentry });
         }
 
-        public static Organism MakeBaby((int, int)XY, OrganismSentry organismSentry)
+        public static Organism MakeBaby((int, int)XY, AnimalSentry organismSentry)
         {
-            bool babyMale;
+            Sex babySex;
             int babyRange;
-            babyMale = randomSex(organismSentry);
+            babySex = randomSex(organismSentry);
             babyRange = randomVisionRange(organismSentry);
-            return SetOrganism<T>(XY, babyRange, babyMale, StutterUntil, organismSentry);
+            return SetOrganism<T>(XY, babyRange, babySex, StutterUntil, organismSentry);
         }
 
-        private static bool randomSex(OrganismSentry organismSentry)
+        private static Sex randomSex(AnimalSentry organismSentry)
         {
-            return organismSentry.Random.Next(100) > 50;
+            return (organismSentry.Random.Next(100) > 50)? Sex.Female : Sex.Male;
         }
 
-        private static int randomVisionRange(OrganismSentry organismSentry)
+        private static int randomVisionRange(AnimalSentry organismSentry)
         {
             return organismSentry.MaxOrgVisionRange - organismSentry.Random.Next(organismSentry.MaxOrgVisionRange);
         }
@@ -162,7 +160,7 @@ namespace WindowsFormsApp1
         {
             if (WantReproduce)
             {
-                Organism<T,TFood> potentialPartner = organismSentry.FindOrganismPartner<T,TFood>((X, Y), Male);
+                Organism<T,TFood> potentialPartner = organismSentry.FindOrganismPartner<T,TFood>((X, Y), Sex);
                 if (potentialPartner != null)
                 {
                     changeValuesOnReproduce();
@@ -182,7 +180,7 @@ namespace WindowsFormsApp1
         private Direction makeDecision(Direction direction)
         {
             if (WantReproduce)
-                direction = chooseDirection(findOnMap(Male));
+                direction = chooseDirection(findOnMap(Sex));
             else if (WantFood)
                 direction = chooseDirection(findOnMap(null));
             // no idea what to do
@@ -204,11 +202,11 @@ namespace WindowsFormsApp1
         {
             return (organismSentry.IsItDayToday()) ? OrganismRange : OrganismRange / 2;
         }
-        private bool cellIsAppropriate((int, int) XY, bool? sex)
+        private bool cellIsAppropriate((int, int) XY, Sex? sex)
         {
             return organismSentry.CellIsAppropriate<T, TFood>(XY, sex);
         }
-        private (int, int)? checkLines(int range, bool? sex)
+        private (int, int)? checkLines(int range, Sex? sex)
         {
             // top
             for (int i = X - range; i < X + range; i++)
@@ -229,7 +227,7 @@ namespace WindowsFormsApp1
             return null;
 
         }
-        private (int, int)? findOnMap(bool? sex)
+        private (int, int)? findOnMap(Sex? sex)
         {
             int currentRange = 1;
             int maxRange = setActualRange();

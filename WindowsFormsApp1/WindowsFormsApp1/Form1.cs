@@ -89,11 +89,11 @@ namespace WindowsFormsApp1
                 return Brushes.DarkOliveGreen;
             return Brushes.Purple;
         }
-        private void paintOrg(int x, int y, bool isAlive, bool male, Brush ifMale, Brush ifFemale, Brush ifDead)
+        private void paintOrg(int x, int y, bool isAlive, Sex sex, Brush ifMale, Brush ifFemale, Brush ifDead)
         {
             if (isAlive)
             {
-                if (male)
+                if (sex == Sex.Male)
                     graphics.FillEllipse(ifMale, x * (int)resolutionUpDown.Value, y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                 else
                     graphics.FillEllipse(ifFemale, x * (int)resolutionUpDown.Value, y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
@@ -112,13 +112,13 @@ namespace WindowsFormsApp1
             if (observedOrganism != null)
             {
                 (Brush, Brush, Brush) orgColors = chooseOrganismColor(observedOrganism);
-                paintOrg(observedOrganism.X, observedOrganism.Y, observedOrganism.GetIsAlive(), observedOrganism.GetGender(), orgColors.Item1, orgColors.Item2, orgColors.Item3);
+                paintOrg(observedOrganism.X, observedOrganism.Y, observedOrganism.GetIsAlive(), observedOrganism.GetSex(), orgColors.Item1, orgColors.Item2, orgColors.Item3);
             }
         }
 
-        private void refreshOrgShowingInfo(bool alive, bool male, bool wantReproduce, bool wantFood, int fullness, int x, int y, int ID, int visionRange, int beforeBecomingPlant, string animalType)
+        private void refreshOrgShowingInfo(bool alive, Sex sex, bool wantReproduce, bool wantFood, int fullness, int x, int y, int ID, int visionRange, int beforeBecomingPlant, string animalType)
         {
-            sexLabel.Text = $"{((male) ? "Male" : "Female") }";
+            sexLabel.Text = $"{((sex == Sex.Male) ? "Male" : "Female") }";
             hungerLabel.Text = $"{fullness.ToString()}";
             labelAnimal.Text = animalType;
             positionXLabel.Text = $"{x.ToString()}";
@@ -154,7 +154,7 @@ namespace WindowsFormsApp1
             observedOrganism = runner.TryToGetOrganism(XY);
             if (observedOrganism != null)
             {
-                refreshOrgShowingInfo(observedOrganism.GetIsAlive(), observedOrganism.GetGender(), observedOrganism.GetReproduceWish(), observedOrganism.GetFoodEatingWish(), observedOrganism.GetFullness(), observedOrganism.X, observedOrganism.Y, observedOrganism.ID, observedOrganism.GetOrganismRange(), observedOrganism.GetBeforeBecomingPlant(), observedOrganism.GetOrganismType());
+                refreshOrgShowingInfo(observedOrganism.GetIsAlive(), observedOrganism.GetSex(), observedOrganism.GetReproduceWish(), observedOrganism.GetFoodEatingWish(), observedOrganism.GetFullness(), observedOrganism.X, observedOrganism.Y, observedOrganism.ID, observedOrganism.GetOrganismRange(), observedOrganism.GetBeforeBecomingPlant(), observedOrganism.GetOrganismType());
                 paintObservedOrg(XY);
             }
         }
@@ -267,11 +267,11 @@ namespace WindowsFormsApp1
 
             // show orgs
             foreach (var organism in map.mainSentry.organismSentry.Organisms)
-                paintOrg(organism.X, organism.Y, organism.GetIsAlive(), organism.GetGender(), chooseOrganismColor(organism).Item1, chooseOrganismColor(organism).Item2, chooseOrganismColor(organism).Item3);
+                paintOrg(organism.X, organism.Y, organism.GetIsAlive(), organism.GetSex(), chooseOrganismColor(organism).Item1, chooseOrganismColor(organism).Item2, chooseOrganismColor(organism).Item3);
             
 
             if (observedOrganism != null)
-                refreshOrgShowingInfo(observedOrganism.GetIsAlive(), observedOrganism.GetGender(), observedOrganism.GetReproduceWish(), observedOrganism.GetFoodEatingWish(), observedOrganism.GetFullness(), observedOrganism.X, observedOrganism.Y, observedOrganism.ID, observedOrganism.GetOrganismRange(), observedOrganism.GetBeforeBecomingPlant(), observedOrganism.GetOrganismType());
+                refreshOrgShowingInfo(observedOrganism.GetIsAlive(), observedOrganism.GetSex(), observedOrganism.GetReproduceWish(), observedOrganism.GetFoodEatingWish(), observedOrganism.GetFullness(), observedOrganism.X, observedOrganism.Y, observedOrganism.ID, observedOrganism.GetOrganismRange(), observedOrganism.GetBeforeBecomingPlant(), observedOrganism.GetOrganismType());
 
 
             refreshInfoAboutDay();

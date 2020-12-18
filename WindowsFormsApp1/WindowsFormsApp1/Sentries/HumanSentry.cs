@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
 {
-    public class OrganismSentry
+    public class HumanSentry
     {
         public List<Organism> Organisms;
 
@@ -225,7 +225,7 @@ namespace WindowsFormsApp1
             return mainSentry.CheckBorders(XY);
         }
 
-        public bool CellIsAppropriate<T, TFood>((int, int) XY, bool? sex)
+        public bool CellIsAppropriate<T, TFood>((int, int) XY, Sex? sex)
             where T : Organism
             where TFood : Edible
         {
@@ -235,7 +235,7 @@ namespace WindowsFormsApp1
             }
             if (sex != null)
             {
-                Organism<T, TFood> potentialPartner = mainSentry.FindOrganismPartnerOnCell<T,TFood>(XY, (bool)sex);
+                Organism<T, TFood> potentialPartner = mainSentry.FindOrganismPartnerOnCell<T,TFood>(XY, (Sex)sex);
                 if (potentialPartner != null)
                     return true;
                 return false;
@@ -243,11 +243,11 @@ namespace WindowsFormsApp1
             return mainSentry.IsOnCell<TFood>(XY);
         }
 
-        public Organism<T, TFood> FindOrganismPartner<T, TFood>((int, int) XY, bool male)
+        public Organism<T, TFood> FindOrganismPartner<T, TFood>((int, int) XY, Sex sex)
             where T : Organism
             where TFood : Edible
         {
-            return mainSentry.FindOrganismPartnerOnCell<T, TFood>(XY, male);
+            return mainSentry.FindOrganismPartnerOnCell<T, TFood>(XY, sex);
         }
 
         public void OrganismWasDestroyedOnCell(Organism organism)

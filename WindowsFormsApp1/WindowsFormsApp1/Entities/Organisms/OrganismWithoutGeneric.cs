@@ -16,7 +16,7 @@ namespace WindowsFormsApp1
 
         public abstract bool GetIsAlive();
 
-        public abstract bool GetGender();
+        public abstract Sex GetSex();
 
         public abstract bool GetReproduceWish();
 

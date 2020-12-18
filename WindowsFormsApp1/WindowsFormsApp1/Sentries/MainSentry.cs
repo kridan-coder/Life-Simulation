@@ -9,7 +9,7 @@ namespace WindowsFormsApp1
     public class MainSentry
     {
         public PlantSentry plantSentry;
-        public OrganismSentry organismSentry;
+        public AnimalSentry organismSentry;
         public DayNightSentry dayNightSentry;
         public MeteoriteSentry meteoriteSentry;
 
@@ -49,7 +49,7 @@ namespace WindowsFormsApp1
             Random = map.Random;
             Map = map;
             plantSentry = new PlantSentry(apples, applesGrowth, carrots, carrotsGrowth, oats, oatsGrowth, this);
-            organismSentry = new OrganismSentry(humans, ticksHumanStutter, deers, ticksDeerStutter, mice, ticksMouseStutter, rabbits, ticksRabbitStutter, bears, ticksBearStutter, pigs, ticksPigStutter, raccoons, ticksRaccoonStutter, foxes, ticksFoxStutter, lions, ticksLionStutter, wolves, ticksWolfStutter, maxOrgVisionRange, maxOrgTicksBeforeReproducing, maxOrgTicksBeforeBecomingGrass, this);
+            organismSentry = new AnimalSentry(humans, ticksHumanStutter, deers, ticksDeerStutter, mice, ticksMouseStutter, rabbits, ticksRabbitStutter, bears, ticksBearStutter, pigs, ticksPigStutter, raccoons, ticksRaccoonStutter, foxes, ticksFoxStutter, lions, ticksLionStutter, wolves, ticksWolfStutter, maxOrgVisionRange, maxOrgTicksBeforeReproducing, maxOrgTicksBeforeBecomingGrass, this);
             dayNightSentry = new DayNightSentry(dayNightChange, this);
             meteoriteSentry = new MeteoriteSentry(maxTicksMeteoriteFalling, maxTicksMeteoriteCracking, maxTicksMeteoriteBeforeDissolving, maxAmountOfMeteoritesFallingSimultaneously, chanceOfMeteoriteToFallOnMap, this);
             this.chanceOfHumanToSpawnOnShard = chanceOfHumanToSpawnOnShard;
@@ -115,7 +115,7 @@ namespace WindowsFormsApp1
             return false;
         }
 
-        public Organism<T, TFood> FindOrganismPartnerOnCell<T, TFood>((int, int) XY, bool mySex)
+        public Organism<T, TFood> FindOrganismPartnerOnCell<T, TFood>((int, int) XY, Sex mySex)
             where T : Organism
             where TFood : Edible
         {
@@ -123,7 +123,7 @@ namespace WindowsFormsApp1
                 if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is Organism<T, TFood>)
                 {
                     Organism<T, TFood> potentialPartner = (Organism<T, TFood>)Map.Cells[XY.Item1, XY.Item2].OnCell[i];
-                    if (potentialPartner.IsAlive && potentialPartner.Male != mySex && potentialPartner.WantReproduce)
+                    if (potentialPartner.IsAlive && potentialPartner.Sex != mySex && potentialPartner.WantReproduce)
                         return potentialPartner;
                 }
             return null;
