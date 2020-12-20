@@ -9,9 +9,10 @@ namespace WindowsFormsApp1
     public class MainSentry
     {
         public PlantSentry plantSentry;
-        public AnimalSentry organismSentry;
+        public OrganismSentry organismSentry;
         public DayNightSentry dayNightSentry;
         public MeteoriteSentry meteoriteSentry;
+        public HouseSentry houseSentry;
 
         private int chanceOfHumanToSpawnOnShard;
         private int chanceOfPlantToSpawnOnShard;
@@ -49,9 +50,10 @@ namespace WindowsFormsApp1
             Random = map.Random;
             Map = map;
             plantSentry = new PlantSentry(apples, applesGrowth, carrots, carrotsGrowth, oats, oatsGrowth, this);
-            organismSentry = new AnimalSentry(humans, ticksHumanStutter, deers, ticksDeerStutter, mice, ticksMouseStutter, rabbits, ticksRabbitStutter, bears, ticksBearStutter, pigs, ticksPigStutter, raccoons, ticksRaccoonStutter, foxes, ticksFoxStutter, lions, ticksLionStutter, wolves, ticksWolfStutter, maxOrgVisionRange, maxOrgTicksBeforeReproducing, maxOrgTicksBeforeBecomingGrass, this);
+            organismSentry = new OrganismSentry(humans, ticksHumanStutter, deers, ticksDeerStutter, mice, ticksMouseStutter, rabbits, ticksRabbitStutter, bears, ticksBearStutter, pigs, ticksPigStutter, raccoons, ticksRaccoonStutter, foxes, ticksFoxStutter, lions, ticksLionStutter, wolves, ticksWolfStutter, maxOrgVisionRange, maxOrgTicksBeforeReproducing, maxOrgTicksBeforeBecomingGrass, this);
             dayNightSentry = new DayNightSentry(dayNightChange, this);
             meteoriteSentry = new MeteoriteSentry(maxTicksMeteoriteFalling, maxTicksMeteoriteCracking, maxTicksMeteoriteBeforeDissolving, maxAmountOfMeteoritesFallingSimultaneously, chanceOfMeteoriteToFallOnMap, this);
+            houseSentry = new HouseSentry(this);
             this.chanceOfHumanToSpawnOnShard = chanceOfHumanToSpawnOnShard;
             this.chanceOfPlantToSpawnOnShard = chanceOfPlantToSpawnOnShard;
         }
@@ -131,17 +133,26 @@ namespace WindowsFormsApp1
 
         // conversation between sentries
 
-        public void EntityWasEaten<TFood>((int, int) XY)
+        public Entity EntityWasEaten<TFood>((int, int) XY)
     where TFood : Edible
         {
+            Entity answer = null;
             for (int i = 0; i < Map.Cells[XY.Item1, XY.Item2].OnCell.Count; i++)
                 if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is TFood)
                 {
                     if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is Plant)
+                    {
+                        answer = (Plant)Map.Cells[XY.Item1, XY.Item2].OnCell[i];
                         plantSentry.DeletePlant((Plant)Map.Cells[XY.Item1, XY.Item2].OnCell[i]);
+                        
+                    }
                     else
+                    {
+                        answer = (Organism)Map.Cells[XY.Item1, XY.Item2].OnCell[i];
                         organismSentry.DeleteOrganism((Organism)Map.Cells[XY.Item1, XY.Item2].OnCell[i]);
+                    }
                 }
+            return answer;
         }
 
         public void OrganismBecamePlant(Organism organism)
@@ -202,6 +213,16 @@ namespace WindowsFormsApp1
         {
             return dayNightSentry.Day;
         }
+
+        public House AddAndSummonHouse(int hostPower, int hostChosenX, int hostChosenY, List<Human> owners)
+        {
+            return houseSentry.AddAndSummonHouse(hostPower, hostChosenX, hostChosenY, owners);
+        }
+
+        //public bool AmIAtHome((int, int) humanXY, House house) {
+
+        //    return false;
+        //}
 
     }
 }

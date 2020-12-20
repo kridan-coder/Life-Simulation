@@ -12,7 +12,6 @@ namespace WindowsFormsApp1
 
         MainSentry mainSentry;
 
-
         public Random Random;
         public HouseSentry(MainSentry mainSentry)
         {
@@ -36,17 +35,13 @@ namespace WindowsFormsApp1
                 house.NextTick();
         }
 
-        public void AddAndSummonHouse(int hostPower, int hostChosenX, int hostChosenY, List<Human> owners)
+        public House AddAndSummonHouse(int hostPower, int hostChosenX, int hostChosenY, List<Human> owners)
         {
-
-            Houses.Add(new House(this));
-            Houses[Houses.Count() - 1].HouseSummon(hostPower, hostChosenX, hostChosenY, owners);
+            House brandNewHome = new House(this);
+            brandNewHome.HouseSummon(hostPower, hostChosenX, hostChosenY, owners);
+            Houses.Add(brandNewHome);
+            return brandNewHome;
             //new List<Human>() { Host, Hostess }
-                //if (!Meteorites[i].Active)
-                //{
-                //    Meteorites[i] = new Meteorite(this);
-                //    Meteorites[i].MeteoriteSummon(Random.Next(maxTicksMeteoriteFalling) + 1, Random.Next(maxTicksMeteoriteCracking) + 1, Random.Next(maxTicksMeteoriteBeforeDissolving) + 1, mainSentry.GetRandCoordsOnMap().Item1, mainSentry.GetRandCoordsOnMap().Item2);
-                //}
         }
 
         public void PartWasMadeOnCell(HousePart part)

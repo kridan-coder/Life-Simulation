@@ -10,7 +10,7 @@ namespace WindowsFormsApp1
         where T : Organism
         where TFood : Edible
     {
-        private static AnimalSentry organismSentry;
+        public static OrganismSentry OrganismSentry;
 
         public bool IsAlive;
 
@@ -30,9 +30,9 @@ namespace WindowsFormsApp1
         public bool WantFood = false;
         public bool WantReproduce = false;
 
-        public Organism(int _x, int _y, Sex _sex, int _range, int _rollBack, int _deadUntil, int _stutter, AnimalSentry _organismSentry) : base(_x, _y)
+        public Organism(int _x, int _y, Sex _sex, int _range, int _rollBack, int _deadUntil, int _stutter, OrganismSentry _organismSentry) : base(_x, _y)
         {
-            organismSentry = _organismSentry;
+            OrganismSentry = _organismSentry;
             StutterUntil = _stutter;
             Sex = _sex;
             OrganismRange = _range;
@@ -40,6 +40,8 @@ namespace WindowsFormsApp1
             NoReproduceUntil = _rollBack;
             IsAlive = true;
         }
+
+        public delegate bool SearchDelegate((int, int) XY);
 
         public override bool GetIsAlive()
         {
@@ -86,30 +88,36 @@ namespace WindowsFormsApp1
             Direction direction = Direction.None;
             if (IsAlive)
             {
-                checkFood();
-                checkReproduce();
-                direction = makeDecision(direction);
-                string myTFood = typeof(TFood).Name;
-                makeMove(direction);
+                CheckFood();
+                CheckReproduce();
+                direction = MakeDecisionWhereToGo(direction);
+                MakeMove(direction);
             }
-            else if (deadLongEnough())
-                becomingPlant();
+            else if (DeadLongEnough())
+                BecomingPlant();
         }
         
-        private void checkFood()
+        public virtual void CheckFood()
         {
-            if (organismSentry.IsOnCell<TFood>((X,Y)) && WantFood)
+            if (FoodIsOnCell() && WantFood)
             {
-                changeValuesOnEating();
+                ChangeValuesOnEating();
                 EatFood();
+                return;
             }
         }
-        private void becomingPlant()
+
+        public bool FoodIsOnCell()
         {
-            organismSentry.OrganismBecamePlant(this);
+            return OrganismSentry.IsOnCell<TFood>((X, Y));
         }
 
-        public static Organism RandSpawn(AnimalSentry organismSentry)
+        public void BecomingPlant()
+        {
+            OrganismSentry.OrganismBecamePlant(this);
+        }
+
+        public static Organism RandSpawn(OrganismSentry organismSentry)
         {
             (int, int) XY;
             int orgRange;
@@ -126,13 +134,13 @@ namespace WindowsFormsApp1
             }
         }
 
-        public static Organism SetOrganism<Type>((int, int) XY, int range, Sex Sex, int StutterUntil, AnimalSentry organismSentry) 
+        public static Organism SetOrganism<Type>((int, int) XY, int range, Sex Sex, int StutterUntil, OrganismSentry organismSentry) 
             where Type : Organism
         {
             return (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Sex, range, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeReproducing) + 1, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeBecomingGrass) + 1, StutterUntil, organismSentry });
         }
 
-        public static Organism MakeBaby((int, int)XY, AnimalSentry organismSentry)
+        public static Organism MakeBaby((int, int)XY, OrganismSentry organismSentry)
         {
             Sex babySex;
             int babyRange;
@@ -141,55 +149,55 @@ namespace WindowsFormsApp1
             return SetOrganism<T>(XY, babyRange, babySex, StutterUntil, organismSentry);
         }
 
-        private static Sex randomSex(AnimalSentry organismSentry)
+        private static Sex randomSex(OrganismSentry organismSentry)
         {
             return (organismSentry.Random.Next(100) > 50)? Sex.Female : Sex.Male;
         }
 
-        private static int randomVisionRange(AnimalSentry organismSentry)
+        private static int randomVisionRange(OrganismSentry organismSentry)
         {
             return organismSentry.MaxOrgVisionRange - organismSentry.Random.Next(organismSentry.MaxOrgVisionRange);
         }
 
-        public void EatFood()
+        public Entity EatFood()
         {
-            organismSentry.EntityWasEaten<TFood>((X,Y));
+            return OrganismSentry.EntityWasEaten<TFood>((X,Y));
         }
 
-        private void checkReproduce()
+        public virtual void CheckReproduce()
         {
             if (WantReproduce)
             {
-                Organism<T,TFood> potentialPartner = organismSentry.FindOrganismPartner<T,TFood>((X, Y), Sex);
+                Organism<T,TFood> potentialPartner = OrganismSentry.FindOrganismPartner<T,TFood>((X, Y), Sex);
                 if (potentialPartner != null)
                 {
-                    changeValuesOnReproduce();
-                    potentialPartner.changeValuesOnReproduce();
-                    organismSentry.CreateOrganism(MakeBaby((X,Y), organismSentry));
+                    ChangeValuesOnReproduce();
+                    potentialPartner.ChangeValuesOnReproduce();
+                    OrganismSentry.CreateOrganism(MakeBaby((X,Y), OrganismSentry));
                 }
             }
         }
 
-        private void makeMove(Direction direction)
+        public void MakeMove(Direction direction)
         {
-            organismSentry.OrganismWasDestroyedOnCell(this);
+            OrganismSentry.OrganismWasDestroyedOnCell(this);
             move(direction);
-            changeValuesOnMove();
-            organismSentry.OrganismWasMadeOnCell(this);
+            ChangeValuesOnMove();
+            OrganismSentry.OrganismWasMadeOnCell(this);
         }
-        private Direction makeDecision(Direction direction)
+        public virtual Direction MakeDecisionWhereToGo(Direction direction)
         {
             if (WantReproduce)
-                direction = chooseDirection(findOnMap(Sex));
+                direction = ChooseDirection(FindOnMap(Sex));
             else if (WantFood)
-                direction = chooseDirection(findOnMap(null));
+                direction = ChooseDirection(FindOnMap(null));
             // no idea what to do
             if (direction == Direction.None)
-                direction = RandomDirection8(organismSentry.Random);
-            direction = finalDecision(direction);
+                direction = RandomDirection8(OrganismSentry.Random);
+            direction = FinalDecision(direction);
             return direction;
         }
-        private Direction finalDecision(Direction direction)
+        public Direction FinalDecision(Direction direction)
         {
             if (StutterFor++ >= StutterUntil)
             {
@@ -200,43 +208,42 @@ namespace WindowsFormsApp1
         }
         private int setActualRange()
         {
-            return (organismSentry.IsItDayToday()) ? OrganismRange : OrganismRange / 2;
+            return (OrganismSentry.IsItDayToday()) ? OrganismRange : OrganismRange / 2;
         }
-        private bool cellIsAppropriate((int, int) XY, Sex? sex)
+        public virtual bool CellIsAppropriate((int, int) XY, Sex? sex)
         {
-            return organismSentry.CellIsAppropriate<T, TFood>(XY, sex);
+            return OrganismSentry.CellIsAppropriate<T, TFood>(XY, sex);
         }
-        private (int, int)? checkLines(int range, Sex? sex)
+        private (int, int)? checkLines(int range, Sex? sex, SearchDelegate deleg)
         {
             // top
             for (int i = X - range; i < X + range; i++)
-                if (cellIsAppropriate((i, Y - range), sex))
+                if (CellIsAppropriate((i, Y - range), sex) && deleg((i, Y - range)))
                     return (i, Y - range);
             // right
             for (int i = Y - range; i < Y + range; i++)
-                if (cellIsAppropriate((X + range, i), sex))
+                if (CellIsAppropriate((X + range, i), sex))
                     return (X + range, i);
             // bottom
             for (int i = X + range; i > X - range; i--)
-                if (cellIsAppropriate((i, Y + range), sex))
+                if (CellIsAppropriate((i, Y + range), sex))
                     return (i, Y + range);
             // left
             for (int i = Y + range; i > Y - range; i--)
-                if (cellIsAppropriate((X - range, i), sex))
+                if (CellIsAppropriate((X - range, i), sex))
                     return (X - range, i);
             return null;
-
         }
-        private (int, int)? findOnMap(Sex? sex)
+        public (int, int)? FindOnMap(Sex? sex, SearchDelegate deleg)
         {
             int currentRange = 1;
             int maxRange = setActualRange();
             (int,int)? found = null;
             while (currentRange <= maxRange && found == null)
-                found = checkLines(currentRange++, sex);
+                found = checkLines(currentRange++, sex, deleg);
             return found;
         }
-        private Direction chooseDirection((int, int)? goal)
+        public Direction ChooseDirection((int, int)? goal)
         {
             if (goal == null)
                 return Direction.None;
@@ -320,11 +327,11 @@ namespace WindowsFormsApp1
 
         private bool canStepOnCell((int, int) XY)
         {
-            return organismSentry.CanStepOnCell(XY);
+            return OrganismSentry.CanStepOnCell(XY);
         }
 
         // check if alive and increment DeadFor counter if needed
-        private bool deadLongEnough()
+        public bool DeadLongEnough()
         {
             if (!IsAlive && DeadFor >= DeadUntil)
                 return true;
@@ -332,7 +339,7 @@ namespace WindowsFormsApp1
                 DeadFor++;
             return false;
         }
-        private void changeValuesOnMove()
+        public virtual void ChangeValuesOnMove()
         {
             if (Fullness <= 0)
             {
@@ -361,12 +368,12 @@ namespace WindowsFormsApp1
                     ReproducedFor++;
             }
         }
-        private void changeValuesOnReproduce()
+        public void ChangeValuesOnReproduce()
         {
             ReproducedFor = 0;
             WantReproduce = false;
         }
-        private void changeValuesOnEating()
+        public void ChangeValuesOnEating()
         {
             Fullness = 100;
             WantFood = false;

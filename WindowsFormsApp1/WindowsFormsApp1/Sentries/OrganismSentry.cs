@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
 {
-    public class HumanSentry
+    public class OrganismSentry
     {
         public List<Organism> Organisms;
 
@@ -278,10 +278,10 @@ namespace WindowsFormsApp1
             DeleteOrganism(organism);
         }
 
-        public void EntityWasEaten<TFood>((int, int) XY)
+        public Entity EntityWasEaten<TFood>((int, int) XY)
             where TFood : Edible
         {
-            mainSentry.EntityWasEaten<TFood>(XY);
+            return mainSentry.EntityWasEaten<TFood>(XY);
         }
 
         public void SetOrganismOnCurrentCell<T>((int, int) XY)
@@ -289,5 +289,21 @@ namespace WindowsFormsApp1
         {
             CreateOrganism(Organism<T, Edible>.MakeBaby(XY, this));
         }
+
+
+        //// humans
+        //public bool AmIAtHome((int, int) humanXY, House house)
+        //{
+        //    return mainSentry.AmIAtHome(humanXY, house);
+        //}
+
+        // humans blinb
+
+        public House AddAndSummonHouse(int hostPower, int hostChosenX, int hostChosenY, List<Human> owners)
+        {
+            return mainSentry.AddAndSummonHouse(hostPower, hostChosenX, hostChosenY, owners);
+            //new List<Human>() { Host, Hostess }
+        }
+
     }
 }
