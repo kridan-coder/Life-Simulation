@@ -71,6 +71,7 @@ namespace WindowsFormsApp1
             organismSentry.NextTick();
             meteoriteSentry.NextTick();
             dayNightSentry.NextTick();
+            houseSentry.NextTick();
         }
 
 
@@ -217,6 +218,22 @@ namespace WindowsFormsApp1
         public House AddAndSummonHouse(int hostPower, int hostChosenX, int hostChosenY, List<Human> owners)
         {
             return houseSentry.AddAndSummonHouse(hostPower, hostChosenX, hostChosenY, owners);
+        }
+
+        public bool SpecificHouseIsOnCell((int, int) XY, House house)
+        {
+            if (CheckBorders(XY))
+                return false;
+
+            for (int i = 0; i < Map.Cells[XY.Item1, XY.Item2].OnCell.Count; i++)
+                if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is HousePart)
+                {
+                    HousePart potentialHome = (HousePart)Map.Cells[XY.Item1, XY.Item2].OnCell[i];
+                    if (potentialHome.house == house)
+                        return true;
+                }
+
+            return false;
         }
 
         //public bool AmIAtHome((int, int) humanXY, House house) {

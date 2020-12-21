@@ -217,7 +217,7 @@ namespace WindowsFormsApp1
         }
         public bool IsOnCell<T>((int, int) XY)
         {
-            return mainSentry.IsOnCell<T>(XY);
+            return  mainSentry.CheckBorders(XY) && mainSentry.IsOnCell<T>(XY);
         }
 
         public bool CanStepOnCell((int, int) XY)
@@ -225,7 +225,7 @@ namespace WindowsFormsApp1
             return mainSentry.CheckBorders(XY);
         }
 
-        public bool CellIsAppropriate<T, TFood>((int, int) XY, Sex? sex)
+        public bool CellIsAppropriateForFoodOrPartner<T, TFood>((int, int) XY, Sex? sex)
             where T : Organism
             where TFood : Edible
         {
@@ -304,6 +304,9 @@ namespace WindowsFormsApp1
             return mainSentry.AddAndSummonHouse(hostPower, hostChosenX, hostChosenY, owners);
             //new List<Human>() { Host, Hostess }
         }
-
+        public bool SpecificHouseIsOnCell((int, int) XY, House house)
+        {
+            return mainSentry.SpecificHouseIsOnCell(XY, house);
+        }
     }
 }

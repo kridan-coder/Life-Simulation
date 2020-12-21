@@ -100,7 +100,7 @@ namespace WindowsFormsApp1
             startY = _startY;
             HowManyTicksBuild = _howManyTicksBuild;
             Owners = _owners;
-            StonksMax = HowManyTicksBuild * 3;
+            StonksMax = HowManyTicksBuild * 3 + 1;
             firstTick();
         }
 

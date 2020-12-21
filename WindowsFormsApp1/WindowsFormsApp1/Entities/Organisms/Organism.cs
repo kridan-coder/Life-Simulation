@@ -41,7 +41,10 @@ namespace WindowsFormsApp1
             IsAlive = true;
         }
 
-        public delegate bool SearchDelegate((int, int) XY);
+        public delegate bool SearchDelegate((int, int) XY, Sex? sex, House house);
+        public SearchDelegate SearchFoodOrPartner = (XY, sex, house) => OrganismSentry.CellIsAppropriateForFoodOrPartner<T, TFood>(XY, sex);
+        public SearchDelegate SearchAnyHouse = (XY, sex, house) => OrganismSentry.IsOnCell<HousePart>(XY);
+        public SearchDelegate SearchSpecificHouse = (XY, sex, house) => OrganismSentry.SpecificHouseIsOnCell(XY, house);
 
         public override bool GetIsAlive()
         {
@@ -112,6 +115,11 @@ namespace WindowsFormsApp1
             return OrganismSentry.IsOnCell<TFood>((X, Y));
         }
 
+        public bool PlantIsOnCell()
+        {
+            return OrganismSentry.IsOnCell<Plant>((X, Y));
+        }
+
         public void BecomingPlant()
         {
             OrganismSentry.OrganismBecamePlant(this);
@@ -164,11 +172,15 @@ namespace WindowsFormsApp1
             return OrganismSentry.EntityWasEaten<TFood>((X,Y));
         }
 
+        public Organism<T, TFood> IsPotentialPartnerOnThisCell((int, int) XY, Sex sex)
+        {
+            return OrganismSentry.FindOrganismPartner<T, TFood>((X, Y), Sex);
+        }
         public virtual void CheckReproduce()
         {
             if (WantReproduce)
             {
-                Organism<T,TFood> potentialPartner = OrganismSentry.FindOrganismPartner<T,TFood>((X, Y), Sex);
+                Organism<T, TFood> potentialPartner = IsPotentialPartnerOnThisCell((X,Y), Sex);
                 if (potentialPartner != null)
                 {
                     ChangeValuesOnReproduce();
@@ -188,9 +200,9 @@ namespace WindowsFormsApp1
         public virtual Direction MakeDecisionWhereToGo(Direction direction)
         {
             if (WantReproduce)
-                direction = ChooseDirection(FindOnMap(Sex));
+                direction = ChooseDirection(FindOnMap(SearchFoodOrPartner, Sex, null));
             else if (WantFood)
-                direction = ChooseDirection(FindOnMap(null));
+                direction = ChooseDirection(FindOnMap(SearchFoodOrPartner, null, null));
             // no idea what to do
             if (direction == Direction.None)
                 direction = RandomDirection8(OrganismSentry.Random);
@@ -210,37 +222,42 @@ namespace WindowsFormsApp1
         {
             return (OrganismSentry.IsItDayToday()) ? OrganismRange : OrganismRange / 2;
         }
-        public virtual bool CellIsAppropriate((int, int) XY, Sex? sex)
-        {
-            return OrganismSentry.CellIsAppropriate<T, TFood>(XY, sex);
-        }
-        private (int, int)? checkLines(int range, Sex? sex, SearchDelegate deleg)
+
+
+
+        //public virtual bool CellIsAppropriate((int, int) XY, Sex? sex)
+        //{
+        //    return SearchFoodOrPartner(XY, sex);
+        //    return OrganismSentry.CellIsAppropriateForFoodOrPartner<T, TFood>(XY, sex);
+        //}
+
+        private (int, int)? checkLines(int range, SearchDelegate deleg, Sex? sex, House house)
         {
             // top
             for (int i = X - range; i < X + range; i++)
-                if (CellIsAppropriate((i, Y - range), sex) && deleg((i, Y - range)))
+                if (deleg((i, Y - range), sex, house))
                     return (i, Y - range);
             // right
             for (int i = Y - range; i < Y + range; i++)
-                if (CellIsAppropriate((X + range, i), sex))
+                if (deleg((X + range, i), sex, house))
                     return (X + range, i);
             // bottom
             for (int i = X + range; i > X - range; i--)
-                if (CellIsAppropriate((i, Y + range), sex))
+                if (deleg((i, Y + range), sex, house))
                     return (i, Y + range);
             // left
             for (int i = Y + range; i > Y - range; i--)
-                if (CellIsAppropriate((X - range, i), sex))
+                if (deleg((X - range, i), sex, house))
                     return (X - range, i);
             return null;
         }
-        public (int, int)? FindOnMap(Sex? sex, SearchDelegate deleg)
+        public (int, int)? FindOnMap(SearchDelegate deleg, Sex? sex, House house)
         {
             int currentRange = 1;
             int maxRange = setActualRange();
             (int,int)? found = null;
             while (currentRange <= maxRange && found == null)
-                found = checkLines(currentRange++, sex, deleg);
+                found = checkLines(currentRange++, deleg, sex, house);
             return found;
         }
         public Direction ChooseDirection((int, int)? goal)
@@ -280,43 +297,86 @@ namespace WindowsFormsApp1
         }
         private void move(Direction direction)
         {
+            bool thisFirst = (OrganismSentry.Random.Next(100) > 50) ? true : false;
             switch (direction)
             {
                 case Direction.TopLeft:
-                    if (canStepOnCell((X - 1, Y)))
-                        X--;
-                    else if (canStepOnCell((X, Y - 1)))
-                        Y--;
+                    if (thisFirst)
+                    {
+                        if (canStepOnCell((X - 1, Y)))
+                            X--;
+                        else if (canStepOnCell((X, Y - 1)))
+                            Y--;
+                    }
+                    else
+                    {
+                        if (canStepOnCell((X, Y - 1)))
+                            Y--;
+                        else if (canStepOnCell((X - 1, Y)))
+                            X--;
+                    }
                     break;
                 case Direction.Top:
                     if (canStepOnCell((X, Y - 1)))
                         Y--;
                     break;
                 case Direction.TopRight:
-                    if (canStepOnCell((X + 1, Y)))
-                        X++;
-                    else if (canStepOnCell((X, Y - 1)))
-                        Y--;
+                    if (thisFirst)
+                    {
+                        if (canStepOnCell((X + 1, Y)))
+                            X++;
+                        else if (canStepOnCell((X, Y - 1)))
+                            Y--;
+                    }
+                    else
+                    {
+                        if (canStepOnCell((X, Y - 1)))
+                            Y--;
+                        else if (canStepOnCell((X + 1, Y)))
+                            X++;
+                    }
                     break;
                 case Direction.Right:
                     if (canStepOnCell((X + 1, Y)))
                         X++;
                     break;
                 case Direction.BottomRight:
-                    if (canStepOnCell((X + 1, Y)))
-                        X++;
-                    else if (canStepOnCell((X, Y + 1)))
-                        Y++;
+                    if (thisFirst)
+                    {
+                        if (canStepOnCell((X + 1, Y)))
+                            X++;
+                        else if (canStepOnCell((X, Y + 1)))
+                            Y++;
+                    }
+                    else
+                    {
+                        if (canStepOnCell((X, Y + 1)))
+                            Y++;
+                        else if (canStepOnCell((X + 1, Y)))
+                            X++;
+                    }
+
                     break;
                 case Direction.Bottom:
                     if (canStepOnCell((X, Y + 1)))
                         Y++;
                     break;
                 case Direction.BottomLeft:
-                    if (canStepOnCell((X - 1, Y)))
-                        X--;
-                    else if (canStepOnCell((X, Y + 1)))
-                        Y++;
+                    if (thisFirst)
+                    {
+                        if (canStepOnCell((X - 1, Y)))
+                            X--;
+                        else if (canStepOnCell((X, Y + 1)))
+                            Y++;
+                    }
+                    else
+                    {
+                        if (canStepOnCell((X, Y + 1)))
+                            Y++;
+                        else if (canStepOnCell((X - 1, Y)))
+                            X--;
+                    }
+
                     break;
                 case Direction.Left:
                     if (canStepOnCell((X - 1, Y)))

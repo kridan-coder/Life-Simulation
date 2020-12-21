@@ -38,7 +38,7 @@ namespace WindowsFormsApp1
         {
             if (organism is Human)
             {
-                return (Brushes.Yellow, Brushes.Yellow, Brushes.Yellow);
+                return (Brushes.Goldenrod, Brushes.Gold, Brushes.Gray);
             }
             else if (organism is Bear)
             {
@@ -258,6 +258,15 @@ namespace WindowsFormsApp1
                 }
             }
 
+            // show houses
+
+            foreach (var house in map.mainSentry.houseSentry.Houses)
+            {
+                foreach (var housePart in house.HouseParts)
+                {
+                    graphics.FillRectangle(Brushes.Brown, housePart.X * (int)resolutionUpDown.Value, housePart.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                }
+            }
 
             // show plants
             foreach (var plant in map.mainSentry.plantSentry.Plants)

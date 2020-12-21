@@ -14,6 +14,7 @@ namespace WindowsFormsApp1
         public int Power = 0;
         public bool NeedToCollect = false;
         public bool NeedToBuild = false;
+        public (int, int)? NearestHouse;
         public Human(int _x, int _y, Sex _sex, int _range, int _rollBack, int _deadUntil, int _stutter, OrganismSentry _organismSentry) : base(_x, _y, _sex, _range, _rollBack, _deadUntil, _stutter, _organismSentry)
         {
         }
@@ -30,68 +31,133 @@ namespace WindowsFormsApp1
 
         public void CheckHouse()
         {
-            if (NeedToBuild && HouseCanBeBuiltOnCell())
+            if (NeedToBuild && NearestHouseIsNotClose() && NearestHouseIsNotFar())
             {
                 ChangeValuesOnHouseBuilding();
                 BuildHouse();
             }
         }
 
-        public bool HouseCanBeBuiltOnCell()
+        public bool NearestHouseIsNotClose()
         {
-
-            return false;
+            if (NearestHouse != null)
+            {
+                (int, int) temp = ((int, int))NearestHouse;
+                if ((Math.Abs(temp.Item1 - X) < Power + 3 || Math.Abs(temp.Item2 - Y) < Power + 3))
+                    return false;
+            }
+            return true;
         }
+
+        public bool NearestHouseIsNotFar()
+        {
+            if (NearestHouse != null)
+            {
+                (int, int) temp = ((int, int))NearestHouse;
+                if ((Math.Abs(temp.Item1 - X) > Power + 5 || Math.Abs(temp.Item2 - Y) > Power + 5))
+                    return false;
+            }
+            return true;
+        }
+
 
         public void ChangeValuesOnHouseBuilding()
         {
-
+            // anime
         }
 
         public void BuildHouse()
         {
-            Power = Fullness / 10;
             home = OrganismSentry.AddAndSummonHouse(Power, X, Y, new List<Human>() { this, partner });
+            partner.home = home;
         }
+
+        public virtual bool FindingPartner()
+        {
+            return true;
+        }
+
 
         public override Direction MakeDecisionWhereToGo(Direction direction)
         {
-            if (WantReproduce)
-                direction = ChooseDirection((home.startX, home.startY));
-            else if (WantFood || !HomeStonksAreFull())
-                direction = ChooseDirection(FindOnMap(null));
-            else if (NeedToBuild)
-                direction = 
-            // no idea what to do
-            else if (home == null || !ThisIsHome((X,Y)))
-                direction = RandomDirection8(OrganismSentry.Random);
+
+            if (home == null)
+            {
+                NearestHouse = FindOnMap(SearchAnyHouse, null, null);
+                if (partner == null && WantReproduce)
+                    direction = ChooseDirection(FindOnMap(SearchFoodOrPartner, Sex, null));
+
+                if (WantFood)
+                    direction = ChooseDirection(FindOnMap(SearchFoodOrPartner, null, null));
+                if (NeedToBuild)
+                {
+                    if (!NearestHouseIsNotClose())
+                        direction = RandomDirection8(OrganismSentry.Random);
+                    else if (!NearestHouseIsNotFar())
+                        direction = ChooseDirection(NearestHouse);
+                }
+
+
+
+                if (direction == Direction.None)
+                    direction = RandomDirection8(OrganismSentry.Random);
+            }
+            else if (home != null)
+            {
+                if (WantReproduce)
+                {
+                    if (partner == null)
+                        direction = ChooseDirection(FindOnMap(SearchFoodOrPartner, Sex, null));
+                    else
+                        direction = ChooseDirection((home.startX, home.startY));
+                }
+                else if (WantFood && HomeHasFood())
+                    direction = ChooseDirection(FindOnMap(SearchFoodOrPartner, null, home));
+                else if ((WantFood && !HomeHasFood()) || (NeedToCollect && carriedPlant == null))
+                    direction = ChooseDirection(FindOnMap(SearchFoodOrPartner, null, null));
+
+                else if (carriedPlant != null)
+                    direction = ChooseDirection((home.startX, home.startY));
+
+                if (direction == Direction.None && !ThisIsHome((X, Y)))
+                    direction = ChooseDirection((home.startX, home.startY));
+            }
+
             direction = FinalDecision(direction);
             return direction;
         }
 
 
-        public override bool CellIsAppropriate((int, int) XY, Sex? sex)
-        {
-            return base.CellIsAppropriate(XY, sex) || (home != null && ThisIsHome(XY) && HomeHasFood() && !NeedToCollect);
-        }
 
         public override void CheckFood()
         {
-            if (FoodIsOnCell())
+            if (PlantIsOnCell())
             {
                 if (WantFood)
                 {
                     ChangeValuesOnEating();
                     EatFood();
                 }
-                else if (carriedPlant == null)
+                else if (carriedPlant == null && Sex == Sex.Female && home != null && !HomeStonksAreFull())
                 {
-                    carriedPlant = (Plant)EatFood();
+                    Entity temp = EatFood();
+                    if (temp is Plant)
+                        carriedPlant = (Plant)temp;
                 }
             }
             else if (WantFood && carriedPlant != null)
             {
                 ChangeValuesOnEating();
+                carriedPlant = null;
+            }
+            else if (WantFood && ThisIsHome((X, Y)) && HomeHasFood())
+            {
+                home.Stonks.RemoveAt(home.Stonks.Count - 1);
+                ChangeValuesOnEating();
+            }
+            else if (carriedPlant != null && ThisIsHome((X,Y)))
+            {
+                home.Stonks.Add(carriedPlant);
                 carriedPlant = null;
             }
         }
@@ -104,7 +170,13 @@ namespace WindowsFormsApp1
                 {
                     ChangeValuesOnReproduce();
                     partner.ChangeValuesOnReproduce();
-                    OrganismSentry.CreateOrganism(MakeBaby((X, Y), OrganismSentry));
+                    Human baby = (Human)MakeBaby((X, Y), OrganismSentry);
+                    baby.home = home;
+                    OrganismSentry.CreateOrganism(baby);
+                }
+                else if (partner == null)
+                {
+                    partner = (Human)IsPotentialPartnerOnThisCell((X, Y), Sex);
                 }
             }
         }
@@ -118,13 +190,17 @@ namespace WindowsFormsApp1
                 && ThisIsHome((X, Y));
         }
 
+
         private bool ThisIsHome((int, int) XY)
         {
-            for (int i = 0; i < home.HouseParts.Count() - 1; i++)
+            if (home != null)
             {
-                if (home.HouseParts[i].X == XY.Item1 && home.HouseParts[i].Y == XY.Item2)
+                for (int i = 0; i < home.HouseParts.Count(); i++)
                 {
-                    return true;
+                    if (home.HouseParts[i].X == XY.Item1 && home.HouseParts[i].Y == XY.Item2)
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -133,6 +209,12 @@ namespace WindowsFormsApp1
         public override void ChangeValuesOnMove()
         {
             base.ChangeValuesOnMove();
+            Power = Fullness / 40;
+            if (IsAlive == false && partner != null)
+            {
+                partner.partner = null;
+                partner = null;
+            }
             if (Sex == Sex.Female)
             {
                 if (home != null && !HomeStonksAreFull())

@@ -22,7 +22,7 @@ namespace WindowsFormsApp1
         {
             if (Houses.Count() != 0)
             {
-                for (int i = 0; i < Houses.Count() - 1; i++)
+                for (int i = 0; i < Houses.Count(); i++)
                 {
                     houseNextTick(Houses[i]);
                 }
