@@ -42,6 +42,7 @@ namespace WindowsFormsApp1
         }
 
         public delegate bool SearchDelegate((int, int) XY, Sex? sex, House house);
+        public SearchDelegate SearchForGatheringOrHunting = (XY, sex, house) => (sex == Sex.Female) ? OrganismSentry.CellIsAppropriateForFoodOrPartner<T, SuitableForGathering>(XY, null) : OrganismSentry.CellIsAppropriateForFoodOrPartner<T, SuitableForHunting>(XY, null);
         public SearchDelegate SearchFoodOrPartner = (XY, sex, house) => OrganismSentry.CellIsAppropriateForFoodOrPartner<T, TFood>(XY, sex);
         public SearchDelegate SearchAnyHouse = (XY, sex, house) => OrganismSentry.IsOnCell<HousePart>(XY);
         public SearchDelegate SearchSpecificHouse = (XY, sex, house) => OrganismSentry.SpecificHouseIsOnCell(XY, house);

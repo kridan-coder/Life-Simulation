@@ -48,9 +48,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Barn\BarnPart.cs" />
     <Compile Include="Entities\House\HousePart.cs" />
     <Compile Include="Enums\TimesOfDay.cs" />
     <Compile Include="Enums\Sex.cs" />
+    <Compile Include="RationInterfaces\Suitable\SuitableForHunting.cs" />
+    <Compile Include="RationInterfaces\Suitable\SuitableForGathering.cs" />
+    <Compile Include="Sentries\Barn.cs" />
+    <Compile Include="Sentries\BarnSentry.cs" />
     <Compile Include="Sentries\MainSentry.cs" />
     <Compile Include="Sentries\House.cs" />
     <Compile Include="Sentries\Meteorite.cs" />

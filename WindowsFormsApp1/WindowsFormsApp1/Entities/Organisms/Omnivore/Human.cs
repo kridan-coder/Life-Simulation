@@ -10,7 +10,9 @@ namespace WindowsFormsApp1
     {
         Human partner;
         House home;
-        Plant carriedPlant;
+
+        Entity carriedFood;
+
         public int Power = 0;
         public bool NeedToCollect = false;
         public bool NeedToBuild = false;
@@ -60,10 +62,9 @@ namespace WindowsFormsApp1
             return true;
         }
 
-
         public void ChangeValuesOnHouseBuilding()
         {
-            // anime
+            NeedToBuild = false;
         }
 
         public void BuildHouse()
@@ -86,7 +87,6 @@ namespace WindowsFormsApp1
                 NearestHouse = FindOnMap(SearchAnyHouse, null, null);
                 if (partner == null && WantReproduce)
                     direction = ChooseDirection(FindOnMap(SearchFoodOrPartner, Sex, null));
-
                 if (WantFood)
                     direction = ChooseDirection(FindOnMap(SearchFoodOrPartner, null, null));
                 if (NeedToBuild)
@@ -96,9 +96,6 @@ namespace WindowsFormsApp1
                     else if (!NearestHouseIsNotFar())
                         direction = ChooseDirection(NearestHouse);
                 }
-
-
-
                 if (direction == Direction.None)
                     direction = RandomDirection8(OrganismSentry.Random);
             }
@@ -113,10 +110,10 @@ namespace WindowsFormsApp1
                 }
                 else if (WantFood && HomeHasFood())
                     direction = ChooseDirection(FindOnMap(SearchFoodOrPartner, null, home));
-                else if ((WantFood && !HomeHasFood()) || (NeedToCollect && carriedPlant == null))
-                    direction = ChooseDirection(FindOnMap(SearchFoodOrPartner, null, null));
+                else if ((WantFood && !HomeHasFood()) || (NeedToCollect && carriedFood == null))
+                    direction = ChooseDirection(FindOnMap(SearchForGatheringOrHunting, Sex, null));
 
-                else if (carriedPlant != null)
+                else if (carriedFood != null)
                     direction = ChooseDirection((home.startX, home.startY));
 
                 if (direction == Direction.None && !ThisIsHome((X, Y)))
@@ -131,34 +128,40 @@ namespace WindowsFormsApp1
 
         public override void CheckFood()
         {
-            if (PlantIsOnCell())
+            if (FoodIsOnCell())
             {
                 if (WantFood)
                 {
                     ChangeValuesOnEating();
                     EatFood();
                 }
-                else if (carriedPlant == null && Sex == Sex.Female && home != null && !HomeStonksAreFull())
+                else if (carriedFood == null && Sex == Sex.Female && home != null && !HomeStonksAreFull())
                 {
                     Entity temp = EatFood();
-                    if (temp is Plant)
-                        carriedPlant = (Plant)temp;
+                    if (temp is SuitableForGathering)
+                        carriedFood = (Plant)temp;
+                }
+                else if (carriedFood == null && Sex == Sex.Male && home != null && !HomeStonksAreFull())
+                {
+                    Entity temp = EatFood();
+                    if (temp is SuitableForHunting)
+                        carriedFood = (Organism)temp;
                 }
             }
-            else if (WantFood && carriedPlant != null)
+            else if (WantFood && carriedFood != null)
             {
                 ChangeValuesOnEating();
-                carriedPlant = null;
+                carriedFood = null;
             }
             else if (WantFood && ThisIsHome((X, Y)) && HomeHasFood())
             {
                 home.Stonks.RemoveAt(home.Stonks.Count - 1);
                 ChangeValuesOnEating();
             }
-            else if (carriedPlant != null && ThisIsHome((X,Y)))
+            else if (carriedFood != null && ThisIsHome((X,Y)))
             {
-                home.Stonks.Add(carriedPlant);
-                carriedPlant = null;
+                home.Stonks.Add(carriedFood);
+                carriedFood = null;
             }
         }
 
@@ -215,7 +218,33 @@ namespace WindowsFormsApp1
                 partner.partner = null;
                 partner = null;
             }
-            if (Sex == Sex.Female)
+
+            if (Sex == Sex.Male)
+            {
+                if (home == null)
+                {
+                    if (partner != null)
+                    {
+                        NeedToBuild = true;
+                    }
+                    else
+                    {
+                        NeedToBuild = false;
+                    }
+                }
+                else
+                {
+                    if (!HomeStonksAreFull())
+                    {
+                        NeedToCollect = true;
+                    }
+                    else
+                    {
+                        NeedToCollect = false;
+                    }
+                }
+            }
+            else if (Sex == Sex.Female)
             {
                 if (home != null && !HomeStonksAreFull())
                 {
@@ -226,17 +255,7 @@ namespace WindowsFormsApp1
                     NeedToCollect = false;
                 }
             }
-            else
-            {
-                if (home == null && partner != null)
-                {
-                    NeedToBuild = true;
-                }
-                else
-                {
-                    NeedToBuild = false;
-                }
-            }
+                     
         }
 
         private bool HomeHasFood()

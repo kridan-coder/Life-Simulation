@@ -24,7 +24,7 @@ namespace WindowsFormsApp1
         public bool HasBuilt;
         public bool Deserted;
         public List<HousePart> HouseParts = new List<HousePart>();
-        public List<Plant> Stonks = new List<Plant>();
+        public List<Entity> Stonks = new List<Entity>();
         public List<Human> Owners;
 
         HouseSentry houseSentry;
