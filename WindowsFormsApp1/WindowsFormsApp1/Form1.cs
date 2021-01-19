@@ -245,15 +245,40 @@ namespace WindowsFormsApp1
                 {
                     if (!shard.meteorite.HasFallen)
                     {
+                        //graphics.DrawImage(ImageIcon.GetIcon("Shard"),
+                        //new RectangleF
+                        //(
+                        //            shard.X * (int)resolutionUpDown.Value,
+                        //            shard.Y * (int)resolutionUpDown.Value,
+                        //            (int)resolutionUpDown.Value,
+                        //            (int)resolutionUpDown.Value)
+                        //);
                         graphics.FillRectangle(Brushes.Black, shard.X * (int)resolutionUpDown.Value, shard.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                     }
                     else if (shard.meteorite.HasFallen && !shard.meteorite.BecameCold)
                     {
-                        graphics.FillRectangle(Brushes.Orange, shard.X * (int)resolutionUpDown.Value, shard.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                        graphics.DrawImage(ImageIcon.GetIcon("Shard"),
+                        new RectangleF
+                        (
+                              shard.X * (int)resolutionUpDown.Value,
+                              shard.Y * (int)resolutionUpDown.Value,
+                              (int)resolutionUpDown.Value,
+                              (int)resolutionUpDown.Value)
+                        );
+
+                        //graphics.FillRectangle(Brushes.Orange, shard.X * (int)resolutionUpDown.Value, shard.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                     }
                     else if (shard.meteorite.BecameCold)
                     {
-                        graphics.FillRectangle(Brushes.DarkCyan, shard.X * (int)resolutionUpDown.Value, shard.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                        graphics.DrawImage(ImageIcon.GetIcon("Shard"),
+                        new RectangleF
+                        (
+                              shard.X * (int)resolutionUpDown.Value,
+                              shard.Y * (int)resolutionUpDown.Value,
+                              (int)resolutionUpDown.Value,
+                              (int)resolutionUpDown.Value)
+                        );
+                        //graphics.FillRectangle(Brushes.DarkCyan, shard.X * (int)resolutionUpDown.Value, shard.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                     }
                 }
             }
@@ -263,7 +288,15 @@ namespace WindowsFormsApp1
             {
                 foreach (var housePart in house.HouseParts)
                 {
-                    graphics.FillRectangle(Brushes.Brown, housePart.X * (int)resolutionUpDown.Value, housePart.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    graphics.DrawImage(ImageIcon.GetIcon("HousePart"),
+                    new RectangleF
+                    (
+                          housePart.X * (int)resolutionUpDown.Value,
+                          housePart.Y * (int)resolutionUpDown.Value,
+                          (int)resolutionUpDown.Value,
+                          (int)resolutionUpDown.Value)
+                    );
+                    //graphics.FillRectangle(Brushes.Brown, housePart.X * (int)resolutionUpDown.Value, housePart.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                 }
             }
 
@@ -273,13 +306,29 @@ namespace WindowsFormsApp1
             {
                 foreach (var barnPart in barn.BarnParts)
                 {
-                    graphics.FillRectangle(Brushes.Black, barnPart.X * (int)resolutionUpDown.Value, barnPart.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    graphics.DrawImage(ImageIcon.GetIcon("BarnPart"),
+                    new RectangleF
+                    (
+                          barnPart.X * (int)resolutionUpDown.Value,
+                          barnPart.Y * (int)resolutionUpDown.Value,
+                          (int)resolutionUpDown.Value,
+                          (int)resolutionUpDown.Value)
+                    );
+                    //graphics.FillRectangle(Brushes.Black, barnPart.X * (int)resolutionUpDown.Value, barnPart.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                 }
             }
 
             // show plants
             foreach (var plant in map.mainSentry.plantSentry.Plants)
-                graphics.FillRectangle(choosePlantColor(plant), plant.X * (int)resolutionUpDown.Value, plant.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                graphics.DrawImage(ImageIcon.GetIcon(plant.GetType().Name),
+                new RectangleF
+                (
+                      plant.X * (int)resolutionUpDown.Value,
+                      plant.Y * (int)resolutionUpDown.Value,
+                      (int)resolutionUpDown.Value,
+                      (int)resolutionUpDown.Value)
+                );
+            //graphics.FillRectangle(choosePlantColor(plant), plant.X * (int)resolutionUpDown.Value, plant.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
 
 
 
