@@ -304,9 +304,21 @@ namespace WindowsFormsApp1
             return mainSentry.AddAndSummonHouse(hostPower, hostChosenX, hostChosenY, owners);
             //new List<Human>() { Host, Hostess }
         }
+
+        public Barn FindBarnOnCell((int, int) XY)
+        {
+            return mainSentry.FindBarnOnCell(XY);
+        }
+
         public bool SpecificHouseIsOnCell((int, int) XY, House house)
         {
             return mainSentry.SpecificHouseIsOnCell(XY, house);
+        }
+
+        public Barn AddAndSummonBarn(int hostPower, int hostChosenX, int hostChosenY)
+        {
+            return mainSentry.AddAndSummonBarn(hostPower, hostChosenX, hostChosenY);
+            //new List<Human>() { Host, Hostess }
         }
     }
 }

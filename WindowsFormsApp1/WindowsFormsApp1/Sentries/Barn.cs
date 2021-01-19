@@ -25,7 +25,6 @@ namespace WindowsFormsApp1
         public bool Deserted;
         public List<BarnPart> BarnParts = new List<BarnPart>();
         public List<Entity> Stonks = new List<Entity>();
-        public List<Human> Owners;
 
         BarnSentry barnSentry;
         public Barn(BarnSentry barnSentry)
@@ -93,14 +92,13 @@ namespace WindowsFormsApp1
             }
         }
 
-        public void BarnSummon(int _howManyTicksBuild, int _startX, int _startY, List<Human> _owners)
+        public void BarnSummon(int _howManyTicksBuild, int _startX, int _startY)
         {
             AmountOfActiveBarns++;
             startX = _startX;
             startY = _startY;
             HowManyTicksBuild = _howManyTicksBuild;
-            Owners = _owners;
-            StonksMax = HowManyTicksBuild * 3 + 1;
+            StonksMax = HowManyTicksBuild * 10 + 3;
             firstTick();
         }
 

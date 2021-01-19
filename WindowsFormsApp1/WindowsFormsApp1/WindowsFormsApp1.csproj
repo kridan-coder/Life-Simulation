@@ -54,6 +54,7 @@
     <Compile Include="Enums\Sex.cs" />
     <Compile Include="RationInterfaces\Suitable\SuitableForHunting.cs" />
     <Compile Include="RationInterfaces\Suitable\SuitableForGathering.cs" />
+    <Compile Include="Icon.cs" />
     <Compile Include="Sentries\Barn.cs" />
     <Compile Include="Sentries\BarnSentry.cs" />
     <Compile Include="Sentries\MainSentry.cs" />
@@ -135,6 +136,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icons\icon_apple.png" />
+    <Content Include="icons\icon_barn_part.png" />
+    <Content Include="icons\icon_bear.png" />
+    <Content Include="icons\icon_carrot.png" />
+    <Content Include="icons\icon_deer.png" />
+    <Content Include="icons\icon_fox.png" />
+    <Content Include="icons\icon_house_part.png" />
+    <Content Include="icons\icon_lion.png" />
+    <Content Include="icons\icon_man.png" />
+    <Content Include="icons\icon_mouse.png" />
+    <Content Include="icons\icon_oat.png" />
+    <Content Include="icons\icon_pig.png" />
+    <Content Include="icons\icon_rabbit.png" />
+    <Content Include="icons\icon_raccoon.png" />
+    <Content Include="icons\icon_wolf.png" />
+    <Content Include="icons\icon_woman.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

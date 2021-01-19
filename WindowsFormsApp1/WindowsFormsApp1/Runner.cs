@@ -11,7 +11,7 @@ namespace WindowsFormsApp1
     {
         // organisms set
         private const int humans = 2; private const int ticksHumanStutter = 0;
-        private const int deers = 10; private const int ticksDeerStutter = 2;
+        private const int deers = 5; private const int ticksDeerStutter = 2;
         private const int mice = 0; private const int ticksMouseStutter = 0;
         private const int rabbits = 0; private const int ticksRabbitStutter = 1;
         private const int bears = 0; private const int ticksBearStutter = 2;

@@ -13,6 +13,7 @@ namespace WindowsFormsApp1
         public DayNightSentry dayNightSentry;
         public MeteoriteSentry meteoriteSentry;
         public HouseSentry houseSentry;
+        public BarnSentry barnSentry;
 
         private int chanceOfHumanToSpawnOnShard;
         private int chanceOfPlantToSpawnOnShard;
@@ -54,6 +55,7 @@ namespace WindowsFormsApp1
             dayNightSentry = new DayNightSentry(dayNightChange, this);
             meteoriteSentry = new MeteoriteSentry(maxTicksMeteoriteFalling, maxTicksMeteoriteCracking, maxTicksMeteoriteBeforeDissolving, maxAmountOfMeteoritesFallingSimultaneously, chanceOfMeteoriteToFallOnMap, this);
             houseSentry = new HouseSentry(this);
+            barnSentry = new BarnSentry(this);
             this.chanceOfHumanToSpawnOnShard = chanceOfHumanToSpawnOnShard;
             this.chanceOfPlantToSpawnOnShard = chanceOfPlantToSpawnOnShard;
         }
@@ -132,6 +134,17 @@ namespace WindowsFormsApp1
             return null;
         }
 
+        public Barn FindBarnOnCell((int, int) XY)
+        {
+            for (int i = 0; i < Map.Cells[XY.Item1, XY.Item2].OnCell.Count; i++)
+                if (Map.Cells[XY.Item1, XY.Item2].OnCell[i] is BarnPart)
+                {
+                    BarnPart barnPart = (BarnPart)Map.Cells[XY.Item1, XY.Item2].OnCell[i];
+                    return barnPart.barn;
+                }
+            return null;
+        }
+
         // conversation between sentries
 
         public Entity EntityWasEaten<TFood>((int, int) XY)
@@ -173,7 +186,6 @@ namespace WindowsFormsApp1
                     plantSentry.SetPlantOnCurrentCell<Oat>((organism.X, organism.Y));
                     break;
             }
-
         }
 
         public void ShardKilledEverything((int, int) XY)
@@ -218,6 +230,11 @@ namespace WindowsFormsApp1
         public House AddAndSummonHouse(int hostPower, int hostChosenX, int hostChosenY, List<Human> owners)
         {
             return houseSentry.AddAndSummonHouse(hostPower, hostChosenX, hostChosenY, owners);
+        }
+
+        public Barn AddAndSummonBarn(int hostPower, int hostChosenX, int hostChosenY)
+        {
+            return barnSentry.AddAndSummonBarn(hostPower, hostChosenX, hostChosenY);
         }
 
         public bool SpecificHouseIsOnCell((int, int) XY, House house)

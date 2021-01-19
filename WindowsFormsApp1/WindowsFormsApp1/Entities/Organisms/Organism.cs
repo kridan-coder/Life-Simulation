@@ -45,7 +45,9 @@ namespace WindowsFormsApp1
         public SearchDelegate SearchForGatheringOrHunting = (XY, sex, house) => (sex == Sex.Female) ? OrganismSentry.CellIsAppropriateForFoodOrPartner<T, SuitableForGathering>(XY, null) : OrganismSentry.CellIsAppropriateForFoodOrPartner<T, SuitableForHunting>(XY, null);
         public SearchDelegate SearchFoodOrPartner = (XY, sex, house) => OrganismSentry.CellIsAppropriateForFoodOrPartner<T, TFood>(XY, sex);
         public SearchDelegate SearchAnyHouse = (XY, sex, house) => OrganismSentry.IsOnCell<HousePart>(XY);
+        public SearchDelegate SearchAnyBarn = (XY, sex, house) => OrganismSentry.IsOnCell<BarnPart>(XY);
         public SearchDelegate SearchSpecificHouse = (XY, sex, house) => OrganismSentry.SpecificHouseIsOnCell(XY, house);
+
 
         public override bool GetIsAlive()
         {
@@ -234,29 +236,38 @@ namespace WindowsFormsApp1
 
         private (int, int)? checkLines(int range, SearchDelegate deleg, Sex? sex, House house)
         {
-            // top
-            for (int i = X - range; i < X + range; i++)
-                if (deleg((i, Y - range), sex, house))
-                    return (i, Y - range);
-            // right
-            for (int i = Y - range; i < Y + range; i++)
-                if (deleg((X + range, i), sex, house))
-                    return (X + range, i);
-            // bottom
-            for (int i = X + range; i > X - range; i--)
-                if (deleg((i, Y + range), sex, house))
-                    return (i, Y + range);
-            // left
-            for (int i = Y + range; i > Y - range; i--)
-                if (deleg((X - range, i), sex, house))
-                    return (X - range, i);
+
+            if (range == 0)
+            {
+                if (deleg((X, Y), sex, house))
+                    return (X, Y);
+            }
+            else
+            {
+                // top
+                for (int i = X - range; i < X + range; i++)
+                    if (deleg((i, Y - range), sex, house))
+                        return (i, Y - range);
+                // right
+                for (int i = Y - range; i < Y + range; i++)
+                    if (deleg((X + range, i), sex, house))
+                        return (X + range, i);
+                // bottom
+                for (int i = X + range; i > X - range; i--)
+                    if (deleg((i, Y + range), sex, house))
+                        return (i, Y + range);
+                // left
+                for (int i = Y + range; i > Y - range; i--)
+                    if (deleg((X - range, i), sex, house))
+                        return (X - range, i);
+            }
             return null;
         }
         public (int, int)? FindOnMap(SearchDelegate deleg, Sex? sex, House house)
         {
-            int currentRange = 1;
+            int currentRange = 0;
             int maxRange = setActualRange();
-            (int,int)? found = null;
+            (int, int)? found = null;
             while (currentRange <= maxRange && found == null)
                 found = checkLines(currentRange++, deleg, sex, house);
             return found;

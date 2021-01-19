@@ -259,12 +259,21 @@ namespace WindowsFormsApp1
             }
 
             // show houses
-
             foreach (var house in map.mainSentry.houseSentry.Houses)
             {
                 foreach (var housePart in house.HouseParts)
                 {
                     graphics.FillRectangle(Brushes.Brown, housePart.X * (int)resolutionUpDown.Value, housePart.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                }
+            }
+
+
+            // show barns
+            foreach (var barn in map.mainSentry.barnSentry.Barns)
+            {
+                foreach (var barnPart in barn.BarnParts)
+                {
+                    graphics.FillRectangle(Brushes.Black, barnPart.X * (int)resolutionUpDown.Value, barnPart.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                 }
             }
 

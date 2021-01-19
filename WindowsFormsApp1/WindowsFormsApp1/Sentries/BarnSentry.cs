@@ -35,12 +35,12 @@ namespace WindowsFormsApp1
                 barn.NextTick();
         }
 
-        public Barn AddAndSummonBarn(int hostPower, int hostChosenX, int hostChosenY, List<Human> owners)
+        public Barn AddAndSummonBarn(int hostPower, int hostChosenX, int hostChosenY)
         {
-            Barn brandNewHome = new Barn(this);
-            brandNewHome.BarnSummon(hostPower, hostChosenX, hostChosenY, owners);
-            Barns.Add(brandNewHome);
-            return brandNewHome;
+            Barn brandNewBarn = new Barn(this);
+            brandNewBarn.BarnSummon(hostPower, hostChosenX, hostChosenY);
+            Barns.Add(brandNewBarn);
+            return brandNewBarn;
             //new List<Human>() { Host, Hostess }
         }
 
