@@ -50,11 +50,13 @@
   <ItemGroup>
     <Compile Include="Entities\Barn\BarnPart.cs" />
     <Compile Include="Entities\House\HousePart.cs" />
+    <Compile Include="Enums\CellState.cs" />
     <Compile Include="Enums\TimesOfDay.cs" />
     <Compile Include="Enums\Sex.cs" />
     <Compile Include="RationInterfaces\Suitable\SuitableForHunting.cs" />
     <Compile Include="RationInterfaces\Suitable\SuitableForGathering.cs" />
     <Compile Include="icons\ImageIcon.cs" />
+    <Compile Include="PerlinNoise.cs" />
     <Compile Include="Sentries\Barn.cs" />
     <Compile Include="Sentries\BarnSentry.cs" />
     <Compile Include="Sentries\MainSentry.cs" />

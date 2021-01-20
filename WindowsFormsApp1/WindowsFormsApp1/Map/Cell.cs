@@ -8,11 +8,18 @@ namespace WindowsFormsApp1
 {
     public class Cell
     {
-        public Cell()
+        public Cell(float noiseValue)
         {
+            NoiseValue = noiseValue;
 #nullable enable
             OnCell = new List<Entity?>();
         }
+
+
+
+        public float NoiseValue;
+        public CellState CellState;
+
 #nullable enable
         public List<Entity?> OnCell;
     }

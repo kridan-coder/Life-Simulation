@@ -28,7 +28,6 @@ namespace WindowsFormsApp1
         private Graphics graphics;
         int resolution;
 
-
         public void StartTimer()
         {
             timer1.Start();
@@ -89,6 +88,56 @@ namespace WindowsFormsApp1
                 return Brushes.DarkOliveGreen;
             return Brushes.Purple;
         }
+
+        private Brush chooseCellColor(Cell cell, bool Day)
+        {
+            if (cell.CellState == CellState.Water)
+            {
+                if (Day)
+                {
+                    return Brushes.Cyan;
+                }
+                else
+                {
+                    return Brushes.DarkViolet;
+                }
+            }
+            else if (cell.CellState == CellState.Sand)
+            {
+                if (Day)
+                {
+                    return Brushes.NavajoWhite;
+                }
+                else
+                {
+                    return Brushes.SandyBrown;
+                }
+            }
+            else if (cell.CellState == CellState.Grass)
+            {
+                if (Day)
+                {
+                    return Brushes.Lime;
+                }
+                else
+                {
+                    return Brushes.LimeGreen;
+                }
+            }
+            else if (cell.CellState == CellState.Hill)
+            {
+                if (Day)
+                {
+                    return Brushes.LightSteelBlue;
+                }
+                else
+                {
+                    return Brushes.LightSlateGray;
+                }
+            }
+            return Brushes.Black;
+        }
+
         private void paintOrg(int x, int y, bool isAlive, Sex sex, Brush ifMale, Brush ifFemale, Brush ifDead)
         {
             if (isAlive)
@@ -226,6 +275,18 @@ namespace WindowsFormsApp1
             pictureBox1.Image = new Bitmap(runner.Cols() * (int)resolutionUpDown.Value, runner.Rows() * (int)resolutionUpDown.Value);
             graphics = Graphics.FromImage(pictureBox1.Image);
         }
+
+        public void DrawBackground(Map map, bool Day)
+        {
+            for (int i = 0; i < map.Rows; i++)
+            {
+                for (int j = 0; j < map.Cols; j++)
+                {
+                    graphics.FillRectangle(chooseCellColor(map.Cells[i, j], Day), j * (int)resolutionUpDown.Value, i * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                }
+            }
+        }
+
         public void DrawCanvas(Map map)
         {
 
@@ -233,10 +294,7 @@ namespace WindowsFormsApp1
                 // resolution changed
                 InitGraphics();
 
-            if (map.mainSentry.dayNightSentry.Day)
-                graphics.Clear(Color.Cornsilk);
-            else
-                graphics.Clear(Color.DarkSlateBlue);
+            DrawBackground(map, map.mainSentry.dayNightSentry.Day);
 
             // show shards
 
