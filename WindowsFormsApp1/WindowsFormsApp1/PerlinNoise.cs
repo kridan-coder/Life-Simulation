@@ -11,6 +11,7 @@ namespace WindowsFormsApp1
     {
         private byte[] PermutationTable = new byte[1024];
         private Random Rand = new Random();
+        
         private const float K = 0.02f;
 
         public PerlinNoise()

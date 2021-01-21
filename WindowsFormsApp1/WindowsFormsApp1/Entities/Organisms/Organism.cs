@@ -148,7 +148,10 @@ namespace WindowsFormsApp1
         public static Organism SetOrganism<Type>((int, int) XY, int range, Sex Sex, int StutterUntil, OrganismSentry organismSentry) 
             where Type : Organism
         {
-            return (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Sex, range, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeReproducing) + 1, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeBecomingGrass) + 1, StutterUntil, organismSentry });
+
+            var org = (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Sex, range, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeReproducing) + 1, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeBecomingGrass) + 1, StutterUntil, organismSentry });
+            org.last_X = XY.Item1; org.last_Y = XY.Item2;
+            return org;
         }
 
         public static Organism MakeBaby((int, int)XY, OrganismSentry organismSentry)
@@ -310,6 +313,8 @@ namespace WindowsFormsApp1
         private void move(Direction direction)
         {
             bool thisFirst = (OrganismSentry.Random.Next(100) > 50) ? true : false;
+            last_X = X;
+            last_Y = Y;
             switch (direction)
             {
                 case Direction.TopLeft:

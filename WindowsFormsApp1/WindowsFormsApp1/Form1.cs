@@ -28,6 +28,8 @@ namespace WindowsFormsApp1
         private Graphics graphics;
         int resolution;
 
+        bool dayIsThere = true;
+
         public void StartTimer()
         {
             timer1.Start();
@@ -269,11 +271,12 @@ namespace WindowsFormsApp1
                 getInfoAboutObservedOrganism(XY);
             }
         }
-        public void InitGraphics()
+        public void InitGraphics(Map map)
         {
             resolution = (int)resolutionUpDown.Value;
             pictureBox1.Image = new Bitmap(runner.Cols() * (int)resolutionUpDown.Value, runner.Rows() * (int)resolutionUpDown.Value);
             graphics = Graphics.FromImage(pictureBox1.Image);
+            DrawBackground(map, map.mainSentry.dayNightSentry.Day);
         }
 
         public void DrawBackground(Map map, bool Day)
@@ -282,19 +285,40 @@ namespace WindowsFormsApp1
             {
                 for (int j = 0; j < map.Cols; j++)
                 {
-                    graphics.FillRectangle(chooseCellColor(map.Cells[i, j], Day), j * (int)resolutionUpDown.Value, i * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
+                    graphics.FillRectangle(chooseCellColor(map.Cells[i, j], Day), i * (int)resolutionUpDown.Value, j * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                 }
+            }
+        }
+
+        public void PaintOverOrgLastPos(Map map, List<Organism> orgs)
+        {
+            foreach (var org in orgs)
+            {
+                graphics.FillRectangle(
+                    chooseCellColor(map.Cells[org.last_X, org.last_Y],
+                    map.mainSentry.dayNightSentry.Day),
+                    org.last_X * (int)resolutionUpDown.Value,
+                    org.last_Y * (int)resolutionUpDown.Value,
+                    (int)resolutionUpDown.Value,
+                    (int)resolutionUpDown.Value);
             }
         }
 
         public void DrawCanvas(Map map)
         {
 
-            if (resolution != (int)resolutionUpDown.Value)
+            if ((resolution != (int)resolutionUpDown.Value) || dayIsThere != map.mainSentry.dayNightSentry.Day)
+            {
                 // resolution changed
-                InitGraphics();
+                InitGraphics(map);
+                dayIsThere = map.mainSentry.dayNightSentry.Day;
+            }
 
-            DrawBackground(map, map.mainSentry.dayNightSentry.Day);
+
+
+
+            PaintOverOrgLastPos(map, map.mainSentry.organismSentry.Organisms);
+
 
             // show shards
 

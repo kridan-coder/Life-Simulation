@@ -11,6 +11,8 @@ namespace WindowsFormsApp1
         private static int lastID;
         public int X;
         public int Y;
+        public int last_X;
+        public int last_Y;
         public int ID;
         public Entity(int _x, int _y)
         {
