@@ -98,12 +98,13 @@ namespace WindowsFormsApp1
 
         public void FirstTick()
         {
-            setStutters();
             setOrganismsRandomly();
+            setStutters();
         }
 
         public void NextTick()
         {
+            setStutters();
             makeMoves();
         }
 
@@ -115,16 +116,8 @@ namespace WindowsFormsApp1
 
         private void setStutters()
         {
-            Organism<Human, Edible>.StutterUntil = TicksHumanStutter;
-            Organism<Deer, Edible>.StutterUntil = TicksDeerStutter;
-            Organism<Mouse, Edible>.StutterUntil = TicksMouseStutter;
-            Organism<Rabbit, Edible>.StutterUntil = TicksRabbitStutter;
-            Organism<Bear, Edible>.StutterUntil = TicksBearStutter;
-            Organism<Pig, Edible>.StutterUntil = TicksPigStutter;
-            Organism<Raccoon, Edible>.StutterUntil = TicksRaccoonStutter;
-            Organism<Fox, Edible>.StutterUntil = TicksFoxStutter;
-            Organism<Lion, Edible>.StutterUntil = TicksLionStutter;
-            Organism<Wolf, Edible>.StutterUntil = TicksWolfStutter;
+            for (int i = Organisms.Count - 1; i >= 0; i--)
+                Organisms[i].SetStutter(mainSentry.Map.Cells[Organisms[i].X, Organisms[i].Y]);
         }
         private void setOrganismsRandomly()
         {

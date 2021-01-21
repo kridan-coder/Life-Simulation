@@ -18,7 +18,7 @@ namespace WindowsFormsApp1
 
         public int DeadUntil;
         public int NoReproduceUntil;
-        public static int StutterUntil;
+        public int StutterUntil;
 
         public Sex Sex;
 
@@ -30,10 +30,9 @@ namespace WindowsFormsApp1
         public bool WantFood = false;
         public bool WantReproduce = false;
 
-        public Organism(int _x, int _y, Sex _sex, int _range, int _rollBack, int _deadUntil, int _stutter, OrganismSentry _organismSentry) : base(_x, _y)
+        public Organism(int _x, int _y, Sex _sex, int _range, int _rollBack, int _deadUntil, OrganismSentry _organismSentry) : base(_x, _y)
         {
             OrganismSentry = _organismSentry;
-            StutterUntil = _stutter;
             Sex = _sex;
             OrganismRange = _range;
             DeadUntil = _deadUntil;
@@ -48,6 +47,25 @@ namespace WindowsFormsApp1
         public SearchDelegate SearchAnyBarn = (XY, sex, house) => OrganismSentry.IsOnCell<BarnPart>(XY);
         public SearchDelegate SearchSpecificHouse = (XY, sex, house) => OrganismSentry.SpecificHouseIsOnCell(XY, house);
 
+        public override void SetStutter(Cell cell)
+        {
+            if (cell.CellState == CellState.Water)
+            {
+                StutterUntil = 3;
+            }
+            else if (cell.CellState == CellState.Sand)
+            {
+                StutterUntil = 2;
+            }
+            else if (cell.CellState == CellState.Grass)
+            {
+                StutterUntil = 0;
+            }
+            else if (cell.CellState == CellState.Hill)
+            {
+                StutterUntil = 1;
+            }
+        }
 
         public override bool GetIsAlive()
         {
@@ -140,16 +158,16 @@ namespace WindowsFormsApp1
                 {
                     Sex = randomSex(organismSentry);
                     orgRange = randomVisionRange(organismSentry);
-                    return SetOrganism<T>(XY, orgRange, Sex, StutterUntil, organismSentry);
+                    return SetOrganism<T>(XY, orgRange, Sex, organismSentry);
                 }
             }
         }
 
-        public static Organism SetOrganism<Type>((int, int) XY, int range, Sex Sex, int StutterUntil, OrganismSentry organismSentry) 
+        public static Organism SetOrganism<Type>((int, int) XY, int range, Sex Sex,  OrganismSentry organismSentry) 
             where Type : Organism
         {
 
-            var org = (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Sex, range, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeReproducing) + 1, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeBecomingGrass) + 1, StutterUntil, organismSentry });
+            var org = (Type)Activator.CreateInstance(typeof(Type), new object[] { XY.Item1, XY.Item2, Sex, range, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeReproducing) + 1, organismSentry.Random.Next(organismSentry.MaxOrgTicksBeforeBecomingGrass) + 1, organismSentry });
             org.last_X = XY.Item1; org.last_Y = XY.Item2;
             return org;
         }
@@ -160,7 +178,7 @@ namespace WindowsFormsApp1
             int babyRange;
             babySex = randomSex(organismSentry);
             babyRange = randomVisionRange(organismSentry);
-            return SetOrganism<T>(XY, babyRange, babySex, StutterUntil, organismSentry);
+            return SetOrganism<T>(XY, babyRange, babySex, organismSentry);
         }
 
         private static Sex randomSex(OrganismSentry organismSentry)

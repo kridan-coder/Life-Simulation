@@ -12,6 +12,9 @@ namespace WindowsFormsApp1
         {
 
         }
+
+        public abstract void SetStutter(Cell cell);
+
         public abstract void NextMove();
 
         public abstract bool GetIsAlive();

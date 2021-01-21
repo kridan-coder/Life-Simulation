@@ -10,41 +10,41 @@ namespace WindowsFormsApp1
     public class Runner
     {
         // organisms set
-        private const int humans = 1; private const int ticksHumanStutter = 0;
-        private const int deers = 0; private const int ticksDeerStutter = 2;
-        private const int mice = 0; private const int ticksMouseStutter = 0;
-        private const int rabbits = 0; private const int ticksRabbitStutter = 1;
-        private const int bears = 0; private const int ticksBearStutter = 2;
-        private const int pigs = 0; private const int ticksPigStutter = 1;
-        private const int raccoons = 0; private const int ticksRaccoonStutter = 1;
-        private const int foxes = 0; private const int ticksFoxStutter = 1;
-        private const int lions = 0; private const int ticksLionStutter = 1;
-        private const int wolves = 0; private const int ticksWolfStutter = 1;
+        private const int humans = 100; private const int ticksHumanStutter = 0;
+        private const int deers = 50; private const int ticksDeerStutter = 2;
+        private const int mice = 50; private const int ticksMouseStutter = 0;
+        private const int rabbits = 50; private const int ticksRabbitStutter = 1;
+        private const int bears = 50; private const int ticksBearStutter = 2;
+        private const int pigs = 50; private const int ticksPigStutter = 1;
+        private const int raccoons = 50; private const int ticksRaccoonStutter = 1;
+        private const int foxes = 50; private const int ticksFoxStutter = 1;
+        private const int lions = 50; private const int ticksLionStutter = 1;
+        private const int wolves = 50; private const int ticksWolfStutter = 1;
 
         // organisms options
-        private const int maxOrgVisionRange = 50;
+        private const int maxOrgVisionRange = 100;
         private const int maxOrgTicksBeforeReproducing = 100;
         private const int maxOrgTicksBeforeBecomingGrass = 200;
 
         // plants set
-        private const int apples = 0; private const int applesGrowth = 0;
-        private const int carrots = 0; private const int carrotsGrowth = 0;
-        private const int oats = 0; private const int oatsGrowth = 0;
+        private const int apples = 40; private const int applesGrowth = 4;
+        private const int carrots = 50; private const int carrotsGrowth = 5;
+        private const int oats = 60; private const int oatsGrowth = 6;
 
         // meteorite
         private const int chanceOfMeteoriteToFallOnMap = 0; // out of 100
-        private const int chanceOfHumanToSpawnOnShard = 3; // out of 100
+        private const int chanceOfHumanToSpawnOnShard = 1; // out of 100
         private const int chanceOfPlantToSpawnOnShard = 3; // out of 100
         // chanceOfNothingToSpawnOnShard = 100 - chanceOfHumanToSpawnOnShard - chanceOfPlantToSpawnOnShard
-        private const int maxAmountOfMeteoritesFallingSimultaneously = 3;
+        private const int maxAmountOfMeteoritesFallingSimultaneously = 5;
         private const int maxTicksMeteoriteFalling = 15;
         private const int maxTicksMeteoriteCracking = 10;
         private const int maxTicksMeteoriteBeforeDissolving = 15;
 
-        private const int rows = 10;
-        private const int cols = 10;
+        private const int rows = 500;
+        private const int cols = 500;
 
-        private const int dayNightChange = 30;
+        private const int dayNightChange = 100;
 
         Map map;
         Form1 form1;

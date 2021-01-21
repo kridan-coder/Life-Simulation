@@ -11,7 +11,7 @@ namespace WindowsFormsApp1
         where T : Organism
         where TFood : EdibleForOmnivore
     {
-        public Omnivore(int _x, int _y, Sex _male, int _range, int _rollBack, int _deadUntil, int _stutter, OrganismSentry _organismSentry) : base(_x, _y, _male, _range, _rollBack, _deadUntil, _stutter, _organismSentry)
+        public Omnivore(int _x, int _y, Sex _male, int _range, int _rollBack, int _deadUntil, OrganismSentry _organismSentry) : base(_x, _y, _male, _range, _rollBack, _deadUntil, _organismSentry)
         {
         }
 
