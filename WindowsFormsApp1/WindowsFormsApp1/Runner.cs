@@ -11,25 +11,25 @@ namespace WindowsFormsApp1
     {
         // organisms set
         private const int humans = 100; private const int ticksHumanStutter = 0;
-        private const int deers = 50; private const int ticksDeerStutter = 2;
-        private const int mice = 50; private const int ticksMouseStutter = 0;
-        private const int rabbits = 50; private const int ticksRabbitStutter = 1;
-        private const int bears = 50; private const int ticksBearStutter = 2;
-        private const int pigs = 50; private const int ticksPigStutter = 1;
-        private const int raccoons = 50; private const int ticksRaccoonStutter = 1;
+        private const int deers = 25; private const int ticksDeerStutter = 2;
+        private const int mice = 30; private const int ticksMouseStutter = 0;
+        private const int rabbits = 20; private const int ticksRabbitStutter = 1;
+        private const int bears = 40; private const int ticksBearStutter = 2;
+        private const int pigs = 20; private const int ticksPigStutter = 1;
+        private const int raccoons = 20; private const int ticksRaccoonStutter = 1;
         private const int foxes = 50; private const int ticksFoxStutter = 1;
-        private const int lions = 50; private const int ticksLionStutter = 1;
-        private const int wolves = 50; private const int ticksWolfStutter = 1;
+        private const int lions = 35; private const int ticksLionStutter = 1;
+        private const int wolves = 40; private const int ticksWolfStutter = 1;
 
         // organisms options
         private const int maxOrgVisionRange = 100;
-        private const int maxOrgTicksBeforeReproducing = 100;
+        private const int maxOrgTicksBeforeReproducing = 200;
         private const int maxOrgTicksBeforeBecomingGrass = 200;
 
         // plants set
-        private const int apples = 40; private const int applesGrowth = 4;
-        private const int carrots = 50; private const int carrotsGrowth = 5;
-        private const int oats = 60; private const int oatsGrowth = 6;
+        private const int apples = 40; private const int applesGrowth = 2;
+        private const int carrots = 50; private const int carrotsGrowth = 3;
+        private const int oats = 60; private const int oatsGrowth = 1;
 
         // meteorite
         private const int chanceOfMeteoriteToFallOnMap = 0; // out of 100
@@ -41,8 +41,8 @@ namespace WindowsFormsApp1
         private const int maxTicksMeteoriteCracking = 10;
         private const int maxTicksMeteoriteBeforeDissolving = 15;
 
-        private const int rows = 500;
-        private const int cols = 500;
+        private const int rows = 150;
+        private const int cols = 150;
 
         private const int dayNightChange = 100;
 

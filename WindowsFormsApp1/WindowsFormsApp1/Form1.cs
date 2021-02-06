@@ -417,22 +417,36 @@ namespace WindowsFormsApp1
             // show orgs
             foreach (var organism in map.mainSentry.organismSentry.Organisms)
             {
-                if (organism is Human)
+                if (organism.GetIsAlive())
                 {
-                    if (organism.GetSex() == Sex.Male)
+                    if (organism is Human)
                     {
-                        graphics.DrawImage(ImageIcon.GetIcon("Man"),
-                        new RectangleF
-                        (
-                              organism.X * (int)resolutionUpDown.Value,
-                              organism.Y * (int)resolutionUpDown.Value,
-                              (int)resolutionUpDown.Value,
-                              (int)resolutionUpDown.Value)
-                        );
+                        if (organism.GetSex() == Sex.Male)
+                        {
+                            graphics.DrawImage(ImageIcon.GetIcon("Man"),
+                            new RectangleF
+                            (
+                                  organism.X * (int)resolutionUpDown.Value,
+                                  organism.Y * (int)resolutionUpDown.Value,
+                                  (int)resolutionUpDown.Value,
+                                  (int)resolutionUpDown.Value)
+                            );
+                        }
+                        else
+                        {
+                            graphics.DrawImage(ImageIcon.GetIcon("Woman"),
+                            new RectangleF
+                            (
+                                  organism.X * (int)resolutionUpDown.Value,
+                                  organism.Y * (int)resolutionUpDown.Value,
+                                  (int)resolutionUpDown.Value,
+                                  (int)resolutionUpDown.Value)
+                            );
+                        }
                     }
                     else
                     {
-                        graphics.DrawImage(ImageIcon.GetIcon("Woman"),
+                        graphics.DrawImage(ImageIcon.GetIcon(organism.GetType().Name),
                         new RectangleF
                         (
                               organism.X * (int)resolutionUpDown.Value,
@@ -444,14 +458,7 @@ namespace WindowsFormsApp1
                 }
                 else
                 {
-                    graphics.DrawImage(ImageIcon.GetIcon(organism.GetType().Name),
-                    new RectangleF
-                    (
-                          organism.X * (int)resolutionUpDown.Value,
-                          organism.Y * (int)resolutionUpDown.Value,
-                          (int)resolutionUpDown.Value,
-                          (int)resolutionUpDown.Value)
-                    );
+                    graphics.FillEllipse(Brushes.Gray, organism.X * (int)resolutionUpDown.Value, organism.Y * (int)resolutionUpDown.Value, (int)resolutionUpDown.Value, (int)resolutionUpDown.Value);
                 }
             }    
                 //paintOrg(organism.X, organism.Y, organism.GetIsAlive(), organism.GetSex(), chooseOrganismColor(organism).Item1, chooseOrganismColor(organism).Item2, chooseOrganismColor(organism).Item3);
